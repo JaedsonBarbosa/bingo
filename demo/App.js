@@ -103,22 +103,36 @@ export default function App() {
         onPress={() => Jogo.current.adicionarNumeroAleatorio()}
         title="Adicionar numero"
       />
-      <Button onPress={async () => {
-        const id = prompt('ID do novo administrador.')
-        if (id) await Administrador.current.adicionarAdministrador(id)
-      }} title="Adicionar administrador" />
-      <Button onPress={async () => {
-        const id = prompt('ID do administrador a ser removido.')
-        if (id) await Administrador.current.removerAdministrador(id)
-      }} title="Remover administrador" />
-      <Button onPress={() => {
-        const admins = await Administrador.current.listarAdministradoresAtivos()
-        console.log(admins)
-      }} title="Listar administradores ativos" />
-      <Button onPress={() => {
-        const admins = await Administrador.current.listarAdministradoresInativos()
-        console.log(admins)
-      }} title="Listar administradores inativos" />
+      <Button
+        onPress={async () => {
+          const id = prompt("ID do novo administrador.");
+          if (id) await Administrador.current.adicionarAdministrador(id);
+        }}
+        title="Adicionar administrador"
+      />
+      <Button
+        onPress={async () => {
+          const id = prompt("ID do administrador a ser removido.");
+          if (id) await Administrador.current.removerAdministrador(id);
+        }}
+        title="Remover administrador"
+      />
+      <Button
+        onPress={async () => {
+          const admins =
+            await Administrador.current.listarAdministradoresAtivos();
+          console.log(admins);
+        }}
+        title="Listar administradores ativos"
+      />
+      <Button
+        onPress={async () => {
+          const admins =
+            await Administrador.current.listarAdministradoresInativos();
+          console.log(admins);
+        }}
+        title="Listar administradores inativos"
+      />
       <Text>Usuário comum</Text>
       <Button onPress={logarComum} title="Logar comum" />
       <Button onPress={pegarCartela} title="Pegar cartela" />
