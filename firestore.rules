@@ -1,0 +1,148 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function verificarCamposData(data, obrigatorio, opcional) {
+      let permitidos = obrigatorio.concat(opcional);
+      return data.keys().hasAll(obrigatorio) &&
+      data.keys().hasOnly(permitidos);
+    }
+
+    function verificarCampos(obrigatorio, opcional) {
+      return verificarCamposData(request.resource.data, obrigatorio, opcional)
+    }
+
+    function isLogged() {
+      return request.auth != null
+    }
+
+    function isAdmin() {
+      return request.auth.token.master || request.auth.token.admin;
+    }
+
+    function organizadorValido(organizador) {
+      let user = get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data;
+      return verificarCamposData(organizador, ['telefone', 'nome', 'estado', 'municipio'], ['admin'])
+        && organizador.telefone == user.telefone
+        && organizador.nome == user.nome
+        && organizador.estado == user.estado
+        && organizador.municipio == user.municipio;
+    }
+
+    match /geral/jogo {
+      function jogoValido() {
+        let data = request.resource.data;
+        return verificarCampos(['numeros', 'titulo', 'organizador'], [])
+          && data.numeros.size() == 0;
+      }
+
+      function atualizacaoValida() {
+        let tituloIgual = resource.data.titulo == request.resource.data.titulo;
+        let novaListaEhUniao = request.resource.data.numeros.hasAll(resource.data.numeros);
+        let novoNumero = request.resource.data.numeros.removeAll(resource.data.numeros);
+        let numeroRepetido = novoNumero.hasAny(resource.data.numeros);
+        let apenasUmNovoNumero = novoNumero.size() == 1;
+        return tituloIgual && novaListaEhUniao && !numeroRepetido && apenasUmNovoNumero;
+      }
+
+      allow read: if isLogged();
+      allow create: if isAdmin() && jogoValido();
+      allow delete: if isAdmin();
+      allow update: if isAdmin() && atualizacaoValida();
+    }
+
+    function existeJogoAtivo() {
+      return exists(/databases/$(database)/documents/geral/jogo)
+    }
+
+    function getJogoAtivo() {
+      return get(/databases/$(database)/documents/geral/jogo).data
+    }
+
+    match /geral/jogo/cartelas/{cartela} {
+      function mesmoIdAntigo() {
+        return resource.id == request.auth.uid ;
+      }
+
+      function mesmoIdNovo() {
+        return request.resource.id == request.auth.uid;
+      }
+
+      function jogoAindaNaoIniciou() {
+        return getJogoAtivo().numeros.size() == 0;
+      }
+
+      function updateValido() {
+        return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ganhou']);
+      }
+
+      function numerosValidos(numeros) {
+        let b = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].toSet();
+        let i = [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30].toSet();
+        let n = [31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45].toSet();
+        let g = [46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60].toSet();
+        let o = [61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75].toSet();
+        return numeros.intersection(b).size() == 5
+          && numeros.intersection(i).size() == 5
+          && numeros.intersection(n).size() == 4
+          && numeros.intersection(g).size() == 5
+          && numeros.intersection(o).size() == 5
+      }
+
+      function cartelaValida() {
+        let numeros = request.resource.data.numeros;
+        let numerosSet = numeros.toSet();
+        let ganhouValido = request.resource.data.ganhou == false;
+        return numeros.size() == 24
+          && numerosSet.size() == 24
+          && ganhouValido
+          && numerosValidos(numerosSet);
+      }
+
+      allow read: if mesmoIdAntigo() || isAdmin();
+      allow create: if mesmoIdNovo()
+        && verificarCampos(['numeros', 'ganhou'], [])
+        && cartelaValida()
+        && existeJogoAtivo()
+        && jogoAindaNaoIniciou();
+      allow update: if (mesmoIdAntigo() || isAdmin()) && updateValido();
+      allow delete: if isAdmin();
+    }
+
+    match /jogos/{jogo} {
+      function validarGanhador(ganhador) {
+        let user = get(/databases/$(database)/documents/usuarios/$(ganhador.id)).data;
+        let cartela = get(/databases/$(database)/documents/geral/jogo/cartelas/$(ganhador.id)).data;
+        let jogo = getJogoAtivo();
+        return verificarCamposData(ganhador, ['telefone', 'nome', 'estado', 'municipio', 'id'], ['admin'])
+          && ganhador.telefone == user.telefone
+          && ganhador.nome == user.nome
+          && ganhador.estado == user.estado
+          && ganhador.municipio == user.municipio
+          && jogo.numeros.hasAll(cartela.numeros);
+      }
+
+      function jogoValido() {
+        let data = request.resource.data;
+        return verificarCampos(['numeros', 'titulo', 'organizador', 'ganhador', 'data'], [])
+          && data.numeros.size() >= 24
+          && organizadorValido(data.organizador)
+          && data.data == request.time
+          && validarGanhador(data.ganhador);
+      }
+
+      allow read: if isLogged();
+      allow write: if existeJogoAtivo()
+        && isAdmin()
+        && jogoValido();
+    }
+
+    match /usuarios/{usuario} {
+      function usuarioValido() {
+        return verificarCampos(['telefone', 'nome', 'estado', 'municipio'], ['admin'])
+      }
+
+      allow read: if resource.id == request.auth.uid || isAdmin();
+      allow write: if request.resource.id == request.auth.uid && usuarioValido();
+    }
+  }
+}
