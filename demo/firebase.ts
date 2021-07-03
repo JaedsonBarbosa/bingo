@@ -138,7 +138,7 @@ export class Administrador {
   }
 
   async adicionarAdministrador(uid: string) {
-    return await functions.httpsCallable("addAdmin")({ uid });
+    await functions.httpsCallable("addAdmin")({ uid });
   }
 
   async removerAdministrador(uid: string) {
@@ -167,6 +167,10 @@ export class Usuario {
   constructor(private usuario: firebase.User) {
     if (!usuario) throw new Error("Usuário necessário.");
     Usuario.current = this;
+  }
+
+  get ID() {
+    return this.usuario.uid
   }
 
   async getCartela(
