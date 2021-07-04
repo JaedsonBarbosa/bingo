@@ -99,19 +99,19 @@ export async function logarUsuario(
 }
 
 export async function encerrarSessao() {
-  await auth.signOut()
+  await auth.signOut();
 }
 
 export async function consultarUltimoJogo() {
-  const jogo = await jogosEncerradosCol.orderBy('data', 'desc').limit(1).get()
-  if (jogo.empty) return undefined
-  return jogo.docs[0].data() as IJogoAntigo
+  const jogo = await jogosEncerradosCol.orderBy("data", "desc").limit(1).get();
+  if (jogo.empty) return undefined;
+  return jogo.docs[0].data() as IJogoAntigo;
 }
 
 export async function consultar10UltimosJogos() {
-  const jogo = await jogosEncerradosCol.orderBy('data', 'desc').limit(10).get()
-  if (jogo.empty) return []
-  return jogo.docs.map(v => v.data() as IJogoAntigo)
+  const jogo = await jogosEncerradosCol.orderBy("data", "desc").limit(10).get();
+  if (jogo.empty) return [];
+  return jogo.docs.map((v) => v.data() as IJogoAntigo);
 }
 
 export class Administrador {
@@ -170,7 +170,7 @@ export class Usuario {
   }
 
   get ID() {
-    return this.usuario.uid
+    return this.usuario.uid;
   }
 
   async getCartela(
@@ -310,10 +310,13 @@ export class Jogo {
 
   async adicionarNumeroAleatorio() {
     let numero = 0;
+    if (this.jogoAtivo.numeros.length == 75)
+      throw new Error("Todos os números já foram chamados.");
     do {
       numero = numeroAleatorio(1, 75);
     } while (this.jogoAtivo.numeros.includes(numero));
     await this.adicionarNumero(numero);
+    return numero;
   }
 
   async encerrar() {
@@ -332,10 +335,10 @@ function gerarNumerosCartela() {
   const g = [46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60];
   const o = [61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75];
   return [
-    ...b.sort((a,b) => (Math.random() * 2) - 1).slice(0,5),
-    ...i.sort((a,b) => (Math.random() * 2) - 1).slice(0,5),
-    ...n.sort((a,b) => (Math.random() * 2) - 1).slice(0,4),
-    ...g.sort((a,b) => (Math.random() * 2) - 1).slice(0,5),
-    ...o.sort((a,b) => (Math.random() * 2) - 1).slice(0,5)
-  ]
+    ...b.sort((a, b) => Math.random() * 2 - 1).slice(0, 5),
+    ...i.sort((a, b) => Math.random() * 2 - 1).slice(0, 5),
+    ...n.sort((a, b) => Math.random() * 2 - 1).slice(0, 4),
+    ...g.sort((a, b) => Math.random() * 2 - 1).slice(0, 5),
+    ...o.sort((a, b) => Math.random() * 2 - 1).slice(0, 5),
+  ];
 }
