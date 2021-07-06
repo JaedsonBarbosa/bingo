@@ -8,19 +8,28 @@ service cloud.firestore {
     }
 
     function verificarCampos(obrigatorio, opcional) {
-      return verificarCamposData(request.resource.data, obrigatorio, opcional)
+      return verificarCamposData(request.resource.data, obrigatorio, opcional);
     }
 
     function isLogged() {
-      return request.auth != null
+      return request.auth != null;
+    }
+
+    function buscarUsuario() {
+      return get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data;
+    }
+
+    function getAdmin(data) {
+      let hasAdmin = data.keys().hasAll(['admin']);
+      return hasAdmin && data.admin
     }
 
     function isAdmin() {
-      return request.auth.token.master || request.auth.token.admin;
+      return request.auth.uid == 'SwHkTu4OPmd42zhPKzYa5Wh3Y6i2' || getAdmin(buscarUsuario());
     }
 
     function organizadorValido(organizador) {
-      let user = get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data;
+      let user = buscarUsuario();
       return verificarCamposData(organizador, ['telefone', 'nome', 'estado', 'municipio'], ['admin'])
         && organizador.telefone == user.telefone
         && organizador.nome == user.nome
@@ -51,16 +60,16 @@ service cloud.firestore {
     }
 
     function existeJogoAtivo() {
-      return exists(/databases/$(database)/documents/geral/jogo)
+      return exists(/databases/$(database)/documents/geral/jogo);
     }
 
     function getJogoAtivo() {
-      return get(/databases/$(database)/documents/geral/jogo).data
+      return get(/databases/$(database)/documents/geral/jogo).data;
     }
 
     match /geral/jogo/cartelas/{cartela} {
       function mesmoIdAntigo() {
-        return resource.id == request.auth.uid ;
+        return resource.id == request.auth.uid;
       }
 
       function mesmoIdNovo() {
@@ -85,7 +94,7 @@ service cloud.firestore {
           && numeros.intersection(i).size() == 5
           && numeros.intersection(n).size() == 4
           && numeros.intersection(g).size() == 5
-          && numeros.intersection(o).size() == 5
+          && numeros.intersection(o).size() == 5;
       }
 
       function cartelaValida() {
@@ -137,12 +146,20 @@ service cloud.firestore {
     }
 
     match /usuarios/{usuario} {
-      function usuarioValido() {
+      function usuarioValido(podeSerAdmin) {
         return verificarCampos(['telefone', 'nome', 'estado', 'municipio'], ['admin'])
+          && (podeSerAdmin || !getAdmin(request.resource.data));
+      }
+
+      function mesmoId() {
+        return request.resource.id == request.auth.uid;
       }
 
       allow read: if resource.id == request.auth.uid || isAdmin();
-      allow write: if request.resource.id == request.auth.uid && usuarioValido();
+      allow create: if mesmoId() && usuarioValido(false);
+      allow update: if (mesmoId() && usuarioValido(getAdmin(resource.data)))
+        || (isAdmin() && usuarioValido(true));
+      allow delete: if false;
     }
   }
 }

@@ -11,13 +11,13 @@ import {
   Usuario,
   habilitarEmulador,
   consultar10UltimosJogos,
-  consultarUltimoJogo,
-  encerrarSessao,
+  consultarUltimoJogo as _consultarUltimoJogo,
+  encerrarSessao as _encerrarSessao,
 } from "./firebase";
 
 export default function App() {
   // Chamar habilitarEmulador para usar os emuladores no lugar do servidor
-  // habilitarEmulador();
+  habilitarEmulador();
 
   const captchaRef = React.useRef(null);
 
@@ -47,7 +47,7 @@ export default function App() {
   const logarAdmin = async () => {
     try {
       const usuario = await logar();
-      const administrador = await Administrador.create(usuario);
+      const administrador = new Administrador(usuario);
       console.log(administrador);
       alert("Logado como administrador.");
     } catch (error) {
@@ -131,6 +131,16 @@ export default function App() {
       });
   }
 
+  function cancelarJogo() {
+    Jogo.current
+      .encerrar()
+      .then(() => alert("Jogo encerrado com sucesso."))
+      .catch((error) => {
+        console.error(error);
+        alert("Erro ao tentar cancelar jogo.");
+      });
+  }
+
   function adicionarAdministrador() {
     const id = pegarResposta("ID do novo administrador.");
     Administrador.current
@@ -190,7 +200,7 @@ export default function App() {
   }
 
   function consultarUltimoJogo() {
-    consultarUltimoJogo()
+    _consultarUltimoJogo()
       .then((v) => {
         console.log(v);
         alert(JSON.stringify(v));
@@ -214,7 +224,7 @@ export default function App() {
   }
 
   function encerrarSessao() {
-    encerrarSessao()
+    _encerrarSessao()
       .then(() => alert("Sessão encerrada"))
       .catch((error) => {
         console.error(error);
@@ -229,6 +239,7 @@ export default function App() {
       <Button onPress={logarAdmin} title="Logar administrador" />
       <Button onPress={abrirJogo} title="Abrir jogo" />
       <Button onPress={adicionarNumeroAleatorio} title="Adicionar numero" />
+      <Button onPress={cancelarJogo} title="Cancelar jogo" />
       <Button onPress={adicionarAdministrador} title="Adicionar admin" />
       <Button onPress={removerAdministrador} title="Remover administrador" />
       <Button onPress={listarAdminsAtivos} title="Listar admins ativos" />

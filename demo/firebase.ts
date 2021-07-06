@@ -3,24 +3,23 @@ import "firebase/auth";
 import "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCi6Yr8TLH0DOfrUWtK9D7PL2C3CITzQRk",
-  authDomain: "bingo-facil-33.firebaseapp.com",
-  projectId: "bingo-facil-33",
-  storageBucket: "bingo-facil-33.appspot.com",
-  messagingSenderId: "920310842656",
-  appId: "1:920310842656:web:b84d52d7669494509ac345",
+  apiKey: "AIzaSyDhxqDJPSacpKe_gx1n4BppD17L4qUR8lo",
+  authDomain: "voicebingo.firebaseapp.com",
+  projectId: "voicebingo",
+  storageBucket: "voicebingo.appspot.com",
+  messagingSenderId: "574006113930",
+  appId: "1:574006113930:web:f7ef107158ce38e46f1f73",
 };
+
 firebase.initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
 auth.useDeviceLanguage();
 const db = firebase.firestore();
-const functions = firebase.app().functions("southamerica-east1");
 
 export function habilitarEmulador() {
   auth.useEmulator("http://localhost:9099");
   db.useEmulator("localhost", 8080);
-  functions.useEmulator("localhost", 5001);
 }
 
 const jogoAtivoRef = db.collection("geral").doc("jogo");
@@ -115,21 +114,16 @@ export async function consultar10UltimosJogos() {
 }
 
 export class Administrador {
-  private constructor(private usuario: IUsuario, private master: boolean) {
+  private readonly usuario: IUsuario
+
+  constructor(usuario: IConjuntoUsuario, private master: boolean) {
+    if (!usuario.usuarioData.admin) throw new Error("Permissão negada.");
     if (!usuario) throw new Error("Usuário necessário.");
+    this.usuario = usuario.usuarioData
+    Administrador.current = this
   }
 
   static current: Administrador = undefined;
-
-  static async create(usuario: IConjuntoUsuario) {
-    console.log(usuario);
-    const idTokenResult = await usuario.usuario.getIdTokenResult();
-    const isMaster = idTokenResult.claims.master;
-    const isAdmin = idTokenResult.claims.admin;
-    if (!isMaster && !isAdmin) throw new Error("Permissão negada.");
-    this.current = new Administrador(usuario.usuarioData, isMaster);
-    return this.current;
-  }
 
   async abrirJogo(getTitulo: () => Promise<string>, params: IJogoParams) {
     const ativo = await jogoAtivoRef.get();
@@ -138,12 +132,11 @@ export class Administrador {
   }
 
   async adicionarAdministrador(uid: string) {
-    await functions.httpsCallable("addAdmin")({ uid });
+    return await usuarioRef(uid).update({ admin: true });
   }
 
   async removerAdministrador(uid: string) {
-    if (!this.master) throw new Error("Permissão negada.");
-    return await functions.httpsCallable("delAdmin")({ uid });
+    return await usuarioRef(uid).update({ admin: false });
   }
 
   async listarAdministradoresAtivos() {
