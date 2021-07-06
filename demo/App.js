@@ -17,7 +17,7 @@ import {
 
 export default function App() {
   // Chamar habilitarEmulador para usar os emuladores no lugar do servidor
-  habilitarEmulador();
+  // habilitarEmulador();
 
   const captchaRef = React.useRef(null);
 
