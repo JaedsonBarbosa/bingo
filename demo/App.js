@@ -30,16 +30,19 @@ export default function App() {
   }
 
   const logar = async () => {
-    const telefone = pegarResposta("Telefone:");
+    let telefone = "";
     return await logarUsuario(
       captchaRef.current,
-      telefone,
+      async () => {
+        if (telefone) return telefone;
+        return (telefone = pegarResposta("Telefone:"));
+      },
       async () => pegarResposta("Codigo"),
       async () => {
         const estado = pegarResposta("Estado");
         const municipio = pegarResposta("Municipio");
         const nome = pegarResposta("Nome");
-        return { telefone, estado, municipio, nome };
+        return { estado, municipio, nome };
       }
     );
   };
@@ -108,7 +111,7 @@ export default function App() {
               ? "Fim do jogo"
               : cartela.ganhou
               ? "Avisado ao organizador."
-              : "Você não ganhou."
+              : "Você ainda não ganhou."
           )
       );
       console.log(cartela.cartela.numeros);

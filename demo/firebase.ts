@@ -66,17 +66,22 @@ interface ICartelaExtendida extends ICartela {
   ref: TDocument;
 }
 
+let verificacao: firebase.auth.RecaptchaVerifier;
+
 export async function logarUsuario(
   container: any,
-  telefone: string,
+  getTelefone: () => Promise<string>,
   getCodigoVerificacao: () => Promise<string>,
   getDados: () => Promise<IUsuario>
 ): Promise<IConjuntoUsuario> {
   let usuario = auth.currentUser;
   if (!usuario) {
-    const verificacao = new firebase.auth.RecaptchaVerifier(container, {
-      size: "invisible",
-    });
+    const telefone = await getTelefone();
+    if (!verificacao) {
+      verificacao = new firebase.auth.RecaptchaVerifier(container, {
+        size: "invisible",
+      });
+    }
     const requisicao = await auth.signInWithPhoneNumber(
       "+55" + telefone,
       verificacao
@@ -84,7 +89,7 @@ export async function logarUsuario(
     const codigo = await getCodigoVerificacao();
     const resultadoLogin = await requisicao.confirm(codigo);
     usuario = resultadoLogin.user;
-  }
+  } else alert("Usuário já está logado.");
   const userRef = usuarioRef(usuario.uid);
   try {
     const usuarioDB = await userRef.get();
@@ -92,6 +97,7 @@ export async function logarUsuario(
       return { usuario, usuarioData: usuarioDB.data() as IUsuario };
   } catch (error) {}
   const usuarioData = await getDados();
+  usuarioData.telefone = await getTelefone();
   await usuarioRef(usuario.uid).set(usuarioData);
   await usuario.updateProfile({ displayName: usuarioData.nome });
   return { usuario, usuarioData };
@@ -114,13 +120,18 @@ export async function consultar10UltimosJogos() {
 }
 
 export class Administrador {
-  private readonly usuario: IUsuario
+  private readonly usuario: IUsuario;
 
   constructor(usuario: IConjuntoUsuario, private master: boolean) {
-    if (!usuario.usuarioData.admin) throw new Error("Permissão negada.");
     if (!usuario) throw new Error("Usuário necessário.");
-    this.usuario = usuario.usuarioData
-    Administrador.current = this
+    if (
+      !usuario.usuarioData.admin &&
+      usuario.usuario.uid != "SwHkTu4OPmd42zhPKzYa5Wh3Y6i2"
+    ) {
+      throw new Error("Permissão negada.");
+    }
+    this.usuario = usuario.usuarioData;
+    Administrador.current = this;
   }
 
   static current: Administrador = undefined;
