@@ -13,11 +13,11 @@ import {
   consultar10UltimosJogos,
   consultarUltimoJogo as _consultarUltimoJogo,
   encerrarSessao as _encerrarSessao,
-} from "./firebase";
+} from "./connect";
 
 export default function App() {
   // Chamar habilitarEmulador para usar os emuladores no lugar do servidor
-  // habilitarEmulador();
+  habilitarEmulador();
 
   const captchaRef = React.useRef(null);
 
