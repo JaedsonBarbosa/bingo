@@ -7,8 +7,9 @@
     "web": "expo start --web",
     "eject": "expo eject",
     "publish": "expo publish",
-    "build": "expo build:web"
+    "build": "expo build:web && copyfiles web-build/** public"
   },
+  "homepage": "/app",
   "dependencies": {
     "expo": "~41.0.1",
     "expo-constants": "~10.1.3",
@@ -23,7 +24,8 @@
   "devDependencies": {
     "@babel/core": "^7.9.0",
     "@types/react": "~16.9.35",
-    "@types/react-native": "~0.63.2"
+    "@types/react-native": "~0.63.2",
+    "copyfiles": "^2.4.1"
   },
   "private": true
 }

@@ -18,12 +18,12 @@
     }
   },
   "hosting": {
-    "public": "./demo/web-build",
+    "public": "public",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {
-        "source": "**",
-        "destination": "/index.html"
+        "source": "/app/**",
+        "destination": "/web-build/index.html"
       }
     ],
     "headers": [
