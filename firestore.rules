@@ -24,8 +24,8 @@ service cloud.firestore {
       return hasAdmin && data.admin
     }
 
-    function isAdmin() {
-      return request.auth.uid == 'SwHkTu4OPmd42zhPKzYa5Wh3Y6i2' || getAdmin(buscarUsuario());
+    function isAdmin() {//SwHkTu4OPmd42zhPKzYa5Wh3Y6i2
+      return request.auth.uid == 'zFL8Cz8fF4mHEgLpL4u8RgTOqt7e' || getAdmin(buscarUsuario());
     }
 
     function organizadorValido(organizador) {

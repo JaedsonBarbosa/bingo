@@ -1,11 +1,6 @@
 document.addEventListener('alpine:init', () => {
-  const auth = firebase.auth()
-
   const params = new URLSearchParams(window.location.search)
-  const adminRequest = params.get('admin')
-
-  const db = firebase.firestore()
-  const usuarios = db.collection('usuarios')
+  const adminRequest = params.has('admin')
 
   const webapp = './webapp.html'
 
@@ -16,8 +11,8 @@ document.addEventListener('alpine:init', () => {
     estado: '',
     municipio: '',
 
-    async init() {
-      auth.onAuthStateChanged((v) => {
+    init() {
+      auth.onAuthStateChanged(async (v) => {
         if (!v) {
           const loginDialog = document.querySelector('#loginDialog')
           if (!loginDialog) return
@@ -40,7 +35,6 @@ document.addEventListener('alpine:init', () => {
         }
         const doc = await usuarios.doc(v.uid).get()
         if (!doc.exists) {
-          alert('Preencha o formulário para prosseguir.')
           this.exibir = true
           return
         }
@@ -49,7 +43,7 @@ document.addEventListener('alpine:init', () => {
         this.nome = data.nome
         this.estado = data.estado
         this.municipio = data.municipio
-        if (data.admin) {
+        if (isAdmin(data, v.uid)) {
           window.location.replace(adminRequest ? './adm.html' : webapp)
         } else {
           if (adminRequest) alert('Você não é um administrador.')
@@ -59,12 +53,15 @@ document.addEventListener('alpine:init', () => {
     },
 
     async atualizar() {
-      await usuarios.doc(v.uid).update({
-        telefone: this.telefone,
-        nome: this.nome,
-        estado: this.estado,
-        municipio: this.municipio,
-      })
+      await usuarios.doc(auth.currentUser.uid).set(
+        {
+          telefone: this.telefone,
+          nome: this.nome,
+          estado: this.estado,
+          municipio: this.municipio,
+        },
+        { merge: true }
+      )
       window.location.replace(webapp)
     },
   }))

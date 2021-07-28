@@ -1,13 +1,20 @@
-import './commom'
-
 document.addEventListener('alpine:init', () => {
   async function carregarUsuarios(admin = true) {
     const res = await usuarios.where('admin', '==', admin).get()
-    return res.docs.map((v) => ({ ...v.data(), id: v.id }))
+    return res.empty ? [] : res.docs.map((v) => ({ ...v.data(), id: v.id }))
   }
 
   Alpine.data('admin', () => ({
-    ...raiz,
+    /** @type {IJogoAntigo[]} */
+    jogos: [],
+
+    /** @type {IUsuario} */
+    userDB: undefined,
+
+    encerrarSessao() {
+      auth.signOut()
+      window.location.replace('./login.html?admin')
+    },
 
     /** @type {IJogo} */
     jogo: undefined,
@@ -48,11 +55,15 @@ document.addEventListener('alpine:init', () => {
     },
 
     get ultimosNumeros() {
-      const valores = this.jogo.numeros
-        .map((v) => v.toString())
-        .reverse()
-        .join(', ')
-      return `Números chamados: <em>${valores}</em>`
+      const nums = this.jogo?.numeros
+      if (!nums?.length) return 'Aguardando...'
+      return nums.slice().reverse().join(', ')
+    },
+
+    get ultimoNumero() {
+      const nums = this.jogo?.numeros
+      if (!nums?.length) return 'Aguardando...'
+      return nums[nums.length - 1]
     },
 
     async init() {
@@ -69,70 +80,72 @@ document.addEventListener('alpine:init', () => {
         return
       }
       const data = doc.data()
-      if (!data.admin) {
+      if (!isAdmin(data, doc.id)) {
         window.location.replace('./webapp.html')
         return
       }
       this.userDB = data
-      monitorarJogo()
-      await this.carregarJogos()
+      this.monitorarJogo()
+      this.jogos = await carregarJogos()
       this.administradores = await carregarUsuarios()
       this.usuarios = await carregarUsuarios(false)
     },
 
     monitorarJogo() {
-      /** @type {() => void} */
-      let encerrar = undefined
       jogo.onSnapshot((j) => {
         if (j.exists) {
           this.jogo = j.data()
           this.jogoRodando = true
-          const g = this.jogo.organizador.telefone == this.user.phoneNumber
-          this.jogoGerenciavel = g
-          if (gerenciavel && !encerrar) {
-            encerrar = cartelas
-              .where('ganhou', '==', true)
-              .onSnapshot(async (v) => {
-                const doc = v.docs[0]
-                /** @type {ICartela} */
-                const cartela = doc.data()
-                const numsJogo = this.jogo.numeros
-                const numsCartela = cartela.numeros
-                if (numsCartela.every((k) => numsJogo.includes(k))) {
-                  // Temos um ganhador
-                  const userDB = await usuarios.doc(doc.id).get()
-                  const registro = {
-                    ...this.jogo,
-                    ganhador: { id: doc.id, ...userDB.data() },
-                    data: firebase.firestore.FieldValue.serverTimestamp(),
-                  }
-                  await jogos.add(registro)
-                  await this.encerrarJogo(false)
-                  encerrar()
-                } else {
-                  // Temos um afobado
-                  this.engano =
-                    'Alguém apertou Bingo faltando ' +
-                    numsCartela
-                      .filter((n) => !numsJogo.includes(n))
-                      .join(', ') +
-                    ' serem chamados.'
-                  doc.ref.update({ ganhou: false })
-                }
-              })
-          }
+          const gerenciavel =
+            this.jogo.organizador.telefone == this.userDB.telefone
+          this.jogoGerenciavel = gerenciavel
+          if (gerenciavel && !this.cancelarMonitoramentoCartelas) monitorarCartelas()
         } else {
           this.jogo = undefined
           this.jogoRodando = false
           this.engano = ''
-          if (encerrar) encerrar()
+          this.cancelarMonitoramentoCartelas?.()
         }
       })
     },
 
+    /** @type {() => void} */
+    cancelarMonitoramentoCartelas: undefined,
+    monitorarCartelas() {
+      this.cancelarMonitoramentoCartelas = cartelas
+        .where('ganhou', '==', true)
+        .onSnapshot(async (v) => {
+          const doc = v.docs[0]
+          if (!doc) return
+          /** @type {ICartela} */
+          const cartela = doc.data()
+          const numsJogo = this.jogo.numeros
+          const numsCartela = cartela.numeros
+          if (numsCartela.every((k) => numsJogo.includes(k))) {
+            // Temos um ganhador
+            const userDB = await usuarios.doc(doc.id).get()
+            const registro = {
+              ...this.jogo,
+              ganhador: { id: doc.id, ...userDB.data() },
+              data: firebase.firestore.FieldValue.serverTimestamp(),
+            }
+            await jogos.add(registro)
+            await this.encerrarJogo(false)
+            encerrar()
+          } else {
+            // Temos um afobado
+            this.engano =
+              'Alguém apertou Bingo faltando ' +
+              numsCartela.filter((n) => !numsJogo.includes(n)).join(', ') +
+              ' serem chamados.'
+            doc.ref.update({ ganhou: false })
+          }
+        })
+    },
+
     async encerrarJogo(verificar = true) {
       const certeza = 'Tem certeza de que quer cancelar o jogo?'
-      if (verificar && !prompt(certeza)) return
+      if (verificar && !confirm(certeza)) return
       const lote = db.batch()
       const registros = await cartelas.get()
       registros.docs.forEach((v) => lote.delete(v.ref))
@@ -143,7 +156,6 @@ document.addEventListener('alpine:init', () => {
     async novoJogo() {
       const titulo = prompt('Titulo do jogo:')
       if (!titulo) alert('Operação cancelada.')
-      else if (!this.userDB) alert(alertaUser)
       else {
         /** @type {IJogo} */
         const novo = {

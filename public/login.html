@@ -6,6 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login</title>
 
+    <!-- Milligram CSS -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css"
+    />
+
     <script src="/__/firebase/8.6.5/firebase-app.js"></script>
     <script src="/__/firebase/8.6.5/firebase-auth.js"></script>
     <script src="/__/firebase/8.6.5/firebase-firestore.js"></script>
@@ -17,12 +31,16 @@
       href="https://www.gstatic.com/firebasejs/ui/4.8.0/firebase-ui-auth.css"
     />
 
+    <link rel="stylesheet" href="style/global.css" />
+
     <script defer src="https://unpkg.com/alpinejs"></script>
+    <script src="code/commom.js"></script>
     <script src="code/login.js"></script>
   </head>
   <body>
     <div id="loginDialog"></div>
-    <main x-data="login" x-cloak x-show="exibir">
+    <main class="container" x-data="login" x-cloak x-show="exibir">
+      <h3>Cadastro</h3>
       <form @submit.prevent="atualizar">
         <label>
           Nome

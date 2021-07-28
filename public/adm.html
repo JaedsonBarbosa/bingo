@@ -29,6 +29,7 @@
     <link rel="stylesheet" href="style/global.css" />
 
     <script defer src="https://unpkg.com/alpinejs"></script>
+    <script src="code/commom.js"></script>
     <script src="code/adm.js"></script>
   </head>
   <body>
@@ -38,18 +39,31 @@
     <main class="container" x-data="admin">
       <p>
         Logado no momento com o número
-        <span x-text="user?.phoneNumber"></span>
+        <span x-text="userDB?.telefone"></span>
         .
       </p>
-
+      <button class="button-outline" @click="encerrarSessao">
+        Encerrar sessão
+      </button>
+      <hr />
       <details>
         <summary class="button">Jogos</summary>
         <h5>Gerenciamento de jogos</h5>
         <template x-if="jogoRodando">
           <div x-show="jogoGerenciavel">
-            <button @click="encerrarJogo">Cancelar jogo</button>
-            <button @click="chamarNumero">Chamar número</button>
-            <p x-html="ultimosNumeros"></p>
+            <button class="button-outline" @click="encerrarJogo">
+              Cancelar jogo
+            </button>
+            <button class="button-outline" @click="chamarNumero">
+              Chamar número
+            </button>
+            <p>
+              Números chamados:
+              <em x-text="ultimosNumeros"></em>
+              <br />
+              Último número:
+              <em x-text="ultimoNumero"></em>
+            </p>
             <p x-show="engano">
               Último engano
               <span x-text="engano"></span>
@@ -60,7 +74,7 @@
           </div>
         </template>
         <div x-show="! jogoRodando">
-          <button @click="novoJogo">Criar jogo</button>
+          <button class="button-outline" @click="novoJogo">Criar jogo</button>
         </div>
 
         <h5>Histórico de jogos</h5>
@@ -74,10 +88,14 @@
           </details>
         </template>
       </details>
-
+      <hr />
       <details>
         <summary class="button">Administradores</summary>
-        <button @click="adicionarAdministrador">Adicionar</button>
+        <h5>Gerenciamento</h5>
+        <button class="button-outline" @click="adicionarAdministrador">
+          Adicionar
+        </button>
+        <h5>Consulta de administradores</h5>
         <template x-for="a in administradores">
           <details>
             <summary x-text="a.nome"></summary>
@@ -91,13 +109,16 @@
               Município
               <span x-text="a.municipio"></span>
             </p>
-            <button @click="removerAdministrador(a.id)">Remover</button>
+            <button class="button-outline" @click="removerAdministrador(a.id)">
+              Remover
+            </button>
           </details>
         </template>
       </details>
-
+      <hr />
       <details>
         <summary class="button">Usuários comuns</summary>
+        <h5>Consulta de usuários</h5>
         <template x-for="u in usuarios">
           <details>
             <summary x-text="a.nome"></summary>
@@ -114,7 +135,6 @@
           </details>
         </template>
       </details>
-      <button>Encerrar sessão</button>
     </main>
   </body>
 </html>
