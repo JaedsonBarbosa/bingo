@@ -70,11 +70,6 @@ interface ICartela {
   ganhou: boolean;
 }
 
-interface ICartelaExtendida extends ICartela {
-  id: string;
-  ref: TDocument;
-}
-
 let verificacao: firebase.auth.RecaptchaVerifier;
 
 export async function logarUsuario(
@@ -126,52 +121,6 @@ export async function consultar10UltimosJogos() {
   const jogo = await jogosEncerradosCol.orderBy("data", "desc").limit(10).get();
   if (jogo.empty) return [];
   return jogo.docs.map((v) => v.data() as IJogoAntigo);
-}
-
-export class Administrador {
-  private readonly usuario: IUsuario;
-
-  constructor(usuario: IConjuntoUsuario, private master: boolean) {
-    if (!usuario) throw new Error("Usuário necessário.");
-    if (
-      !usuario.usuarioData.admin &&
-      usuario.usuario.uid != "SwHkTu4OPmd42zhPKzYa5Wh3Y6i2"
-    ) {
-      throw new Error("Permissão negada.");
-    }
-    this.usuario = usuario.usuarioData;
-    Administrador.current = this;
-  }
-
-  static current: Administrador = undefined;
-
-  async abrirJogo(getTitulo: () => Promise<string>, params: IJogoParams) {
-    const ativo = await jogoAtivoRef.get();
-    if (ativo.exists) return new Jogo(params);
-    return await Jogo.criar(await getTitulo(), this.usuario, params);
-  }
-
-  async adicionarAdministrador(uid: string) {
-    return await usuarioRef(uid).update({ admin: true });
-  }
-
-  async removerAdministrador(uid: string) {
-    return await usuarioRef(uid).update({ admin: false });
-  }
-
-  async listarAdministradoresAtivos() {
-    const admins = await usuariosCol.where("admin", "==", true).get();
-    return admins.docs.map((v) => {
-      return { ...(v.data() as IUsuario), id: v.id };
-    });
-  }
-
-  async listarAdministradoresInativos() {
-    const admins = await usuariosCol.where("admin", "==", false).get();
-    return admins.docs.map((v) => {
-      return { ...(v.data() as IUsuario), id: v.id };
-    });
-  }
 }
 
 export class Usuario {
@@ -236,108 +185,6 @@ export class Cartela {
 
   async bingo() {
     await this.ref.update({ ganhou: true });
-  }
-}
-
-interface IJogoParams {
-  onFalso: (usuario: IUsuario, numerosFaltantes: number[]) => Promise<void>;
-  onGanhador: (usuario: IUsuario, numerosCartela: number[]) => Promise<void>;
-  onEncerramento: () => void;
-}
-
-function numeroAleatorio(min: number, max: number) {
-  return min + Math.floor(Math.random() * (max - min + 1));
-}
-
-export class Jogo {
-  private jogoAtivo: IJogo;
-  private cartelas: ICartelaExtendida[];
-
-  constructor(private params: IJogoParams) {
-    const pararLeituraJogo = jogoAtivoRef.onSnapshot((v) => {
-      const jogo = v.data();
-      if (!jogo) {
-        pararLeituras();
-        params.onEncerramento();
-      } else this.jogoAtivo = jogo as IJogo;
-    });
-    const pararLeituraCartelas = cartelasCol.onSnapshot(async ({ docs }) => {
-      const cartelas = docs.map((v) => {
-        return {
-          ...(v.data() as ICartela),
-          id: v.id,
-          ref: v.ref,
-        } as ICartelaExtendida;
-      });
-      this.cartelas = cartelas;
-      const possivel = cartelas.find((v) => v.ganhou);
-      if (!possivel) return; // Ninguém falou Bingo
-      const numeros = possivel.numeros;
-      const usuarioDB = await usuarioRef(possivel.id).get();
-      const usuario = usuarioDB.data() as IUsuario;
-      const numerosChamados = this.jogoAtivo.numeros;
-      if (numeros.every((n) => numerosChamados.includes(n))) {
-        pararLeituras();
-        params.onGanhador(usuario, numeros);
-        await jogosEncerradosCol.add({
-          ...this.jogoAtivo,
-          ganhador: {
-            id: possivel.id,
-            ...usuario,
-          },
-          data: firebase.firestore.FieldValue.serverTimestamp(),
-        } as IJogoAntigo);
-        await this.encerrar();
-        params.onEncerramento();
-      } else {
-        const faltantes = numeros.filter((n) => !numerosChamados.includes(n));
-        await params.onFalso(usuario, faltantes);
-        await possivel.ref.update({ ganhou: false });
-      }
-    });
-    function pararLeituras() {
-      pararLeituraJogo();
-      pararLeituraCartelas();
-    }
-    Jogo.current = this;
-  }
-
-  static current: Jogo = undefined;
-
-  static async criar(
-    titulo: string,
-    organizador: IUsuario,
-    params: IJogoParams
-  ) {
-    if (!titulo || titulo.length < 4) throw new Error("Titulo inválido");
-    await jogoAtivoRef.set({ titulo, numeros: [], organizador } as IJogo);
-    return new Jogo(params);
-  }
-
-  async adicionarNumero(numero: number) {
-    if (numero < 1 || numero > 75) throw new Error("Numero invalido.");
-    const numeros = firebase.firestore.FieldValue.arrayUnion(numero);
-    await jogoAtivoRef.update({ numeros });
-    this.jogoAtivo.numeros.push(numero);
-  }
-
-  async adicionarNumeroAleatorio() {
-    let numero = 0;
-    if (this.jogoAtivo.numeros.length == 75)
-      throw new Error("Todos os números já foram chamados.");
-    do {
-      numero = numeroAleatorio(1, 75);
-    } while (this.jogoAtivo.numeros.includes(numero));
-    await this.adicionarNumero(numero);
-    return numero;
-  }
-
-  async encerrar() {
-    const lote = db.batch();
-    this.cartelas.forEach((v) => lote.delete(v.ref));
-    lote.delete(jogoAtivoRef);
-    await lote.commit();
-    this.params.onEncerramento();
   }
 }
 

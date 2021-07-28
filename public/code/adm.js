@@ -1,27 +1,13 @@
+import './commom'
+
 document.addEventListener('alpine:init', () => {
-  const auth = firebase.auth()
-  var ui = new firebaseui.auth.AuthUI(auth)
-
-  const db = firebase.firestore()
-  const usuarios = db.collection('usuarios')
-  const jogo = db.collection('geral').doc('jogo')
-  const cartelas = jogo.collection('cartelas')
-  const jogos = db.collection('jogos')
-
   async function carregarUsuarios(admin = true) {
     const res = await usuarios.where('admin', '==', admin).get()
     return res.docs.map((v) => ({ ...v.data(), id: v.id }))
   }
 
-  const alertaUser = 'Usuário sem informações no banco de dados.'
-
   Alpine.data('admin', () => ({
-    iniciado: false,
-    logado: false,
-    /** @type {firebase.UserInfo} */
-    user: undefined,
-    /** @type {IUsuario} */
-    userDB: undefined,
+    ...raiz,
 
     /** @type {IJogo} */
     jogo: undefined,
@@ -29,11 +15,10 @@ document.addEventListener('alpine:init', () => {
     jogoGerenciavel: false,
     engano: '',
 
-    /** @type {IJogoAntigo[]} */
-    jogos: [],
-
     /** @type {IUsuario[]} */
     administradores: [],
+
+    /** @type {IUsuario[]} */
     usuarios: [],
 
     async adicionarAdministrador() {
@@ -57,37 +42,45 @@ document.addEventListener('alpine:init', () => {
 
     async removerAdministrador(id) {
       await usuarios.doc(id).update({ admin: false })
-      const index = this.administradores.findIndex(v => v.id == id)
+      const index = this.administradores.findIndex((v) => v.id == id)
       this.administradores.splice(index, 1)
       alert('Removido administrador.')
     },
 
-    ultimosNumeros(nums) {
-      const valores = nums
+    get ultimosNumeros() {
+      const valores = this.jogo.numeros
         .map((v) => v.toString())
         .reverse()
         .join(', ')
       return `Números chamados: <em>${valores}</em>`
     },
 
-    init() {
-      auth.onAuthStateChanged((v) => {
-        this.user = v
-        this.logado = !!v
-        this.iniciado = true
-        usuarios
-          .doc(v.uid)
-          .get()
-          .then((v) => {
-            if (v.exists) this.userDB = v.data()
-            else {
-              this.userDB = undefined
-              alert(alertaUser)
-            }
-          })
-          .catch(() => alert('Falha ao consultar informações do usuário.'))
-        console.log(v)
-      })
+    async init() {
+      const user = await new Promise((res) =>
+        auth.onAuthStateChanged((v) => res(v))
+      )
+      if (!user) {
+        window.location.replace('./login.html')
+        return
+      }
+      const doc = await usuarios.doc(user.uid).get()
+      if (!doc.exists) {
+        window.location.replace('./login.html')
+        return
+      }
+      const data = doc.data()
+      if (!data.admin) {
+        window.location.replace('./webapp.html')
+        return
+      }
+      this.userDB = data
+      monitorarJogo()
+      await this.carregarJogos()
+      this.administradores = await carregarUsuarios()
+      this.usuarios = await carregarUsuarios(false)
+    },
+
+    monitorarJogo() {
       /** @type {() => void} */
       let encerrar = undefined
       jogo.onSnapshot((j) => {
@@ -135,9 +128,6 @@ document.addEventListener('alpine:init', () => {
           if (encerrar) encerrar()
         }
       })
-      jogos.orderBy('data', 'desc').limit(10).get().then(v => this.jogos = v.docs.map((v) => v.data()))
-      carregarUsuarios().then(v => this.administradores = v)
-      carregarUsuarios(false).then(v => this.usuarios = v)
     },
 
     async encerrarJogo(verificar = true) {
@@ -177,25 +167,6 @@ document.addEventListener('alpine:init', () => {
       } while (nums.includes(numero))
       const numeros = firebase.firestore.FieldValue.arrayUnion(numero)
       await jogo.update({ numeros })
-    },
-
-    openLogin() {
-      this.open = true
-      ui.start('#loginDialog', {
-        callbacks: {
-          signInSuccess: () => false,
-        },
-        signInOptions: [
-          {
-            provider: firebase.auth.PhoneAuthProvider.PROVIDER_ID,
-            defaultCountry: 'BR',
-          },
-        ],
-      })
-    },
-
-    encerrarSessao() {
-      auth.signOut()
     },
   }))
 })

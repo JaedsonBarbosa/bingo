@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/jpg" href="logo.jpg" />
+    <link rel="icon" type="image/jpg" href="assets/logo.jpg" />
     <title>Administração</title>
 
     <!-- Milligram CSS -->
@@ -26,111 +26,95 @@
     <script src="/__/firebase/8.6.5/firebase-firestore.js"></script>
     <script src="/__/firebase/init.js?useEmulator=true"></script>
 
-    <script src="https://www.gstatic.com/firebasejs/ui/4.8.1/firebase-ui-auth__pt_br.js"></script>
-    <link
-      rel="stylesheet"
-      href="https://www.gstatic.com/firebasejs/ui/4.8.0/firebase-ui-auth.css"
-    />
-
-    <link rel="stylesheet" href="global.css" />
+    <link rel="stylesheet" href="style/global.css" />
 
     <script defer src="https://unpkg.com/alpinejs"></script>
-    <script src="admin.js"></script>
+    <script src="code/adm.js"></script>
   </head>
   <body>
     <header class="container">
-      <img src="logo.jpg" alt="Logitipo" />
       <h3>Administração</h3>
     </header>
-    <main class="container" x-data="admin" x-show="iniciado">
-      <div x-show="logado">
-        <p>
-          Logado no momento com o número
-          <span x-text="user?.phoneNumber"></span>
-          .
-        </p>
+    <main class="container" x-data="admin">
+      <p>
+        Logado no momento com o número
+        <span x-text="user?.phoneNumber"></span>
+        .
+      </p>
 
-        <details>
-          <summary class="button">Jogos</summary>
-          <h5>Gerenciamento de jogos</h5>
-          <template x-if="jogoRodando">
-            <div x-show="jogoGerenciavel">
-              <button @click="encerrarJogo">Cancelar jogo</button>
-              <button @click="chamarNumero">Chamar número</button>
-              <p x-html="ultimosNumeros(jogo.numeros)"></p>
-              <p x-show="engano">
-                Último engano
-                <span x-text="engano"></span>
-              </p>
-            </div>
-            <div x-show="! jogoGerenciavel">
-              <p>Um jogo está em execução neste momento.</p>
-            </div>
-          </template>
-          <div x-show="! jogoRodando">
-            <button @click="novoJogo">Criar jogo</button>
+      <details>
+        <summary class="button">Jogos</summary>
+        <h5>Gerenciamento de jogos</h5>
+        <template x-if="jogoRodando">
+          <div x-show="jogoGerenciavel">
+            <button @click="encerrarJogo">Cancelar jogo</button>
+            <button @click="chamarNumero">Chamar número</button>
+            <p x-html="ultimosNumeros"></p>
+            <p x-show="engano">
+              Último engano
+              <span x-text="engano"></span>
+            </p>
           </div>
-
-          <h5>Histórico de jogos</h5>
-          <template x-for="j in jogos">
-            <details>
-              <summary x-text="j.titulo"></summary>
-              <p>
-                Ganhador:
-                <span x-text="j.ganhador.nome"></span>
-              </p>
-            </details>
-          </template>
-        </details>
-
-        <details>
-          <summary class="button">Administradores</summary>
-          <button @click="adicionarAdministrador">Adicionar</button>
-          <template x-for="a in administradores">
-            <details>
-              <summary x-text="a.nome"></summary>
-              <p>
-                Telefone:
-                <span x-text="a.telefone"></span>
-                <br />
-                Estado:
-                <span x-text="a.estado"></span>
-                <br />
-                Município
-                <span x-text="a.municipio"></span>
-              </p>
-              <button @click="removerAdministrador(a.id)">Remover</button>
-            </details>
-          </template>
-        </details>
-
-        <details>
-          <summary class="button">Usuários comuns</summary>
-          <template x-for="u in usuarios">
-            <details>
-              <summary x-text="a.nome"></summary>
-              <p>
-                Telefone:
-                <span x-text="a.telefone"></span>
-                <br />
-                Estado:
-                <span x-text="a.estado"></span>
-                <br />
-                Município
-                <span x-text="a.municipio"></span>
-              </p>
-            </details>
-          </template>
-        </details>
-
-        <button>Encerrar sessão</button>
-      </div>
-      <div x-show="! logado">
-        <button @click="openLogin">Fazer login</button>
-        <div style="width: 100vw">
-          <div id="loginDialog"></div>
+          <div x-show="! jogoGerenciavel">
+            <p>Um jogo está em execução neste momento.</p>
+          </div>
+        </template>
+        <div x-show="! jogoRodando">
+          <button @click="novoJogo">Criar jogo</button>
         </div>
-      </div>
+
+        <h5>Histórico de jogos</h5>
+        <template x-for="j in jogos">
+          <details>
+            <summary x-text="j.titulo"></summary>
+            <p>
+              Ganhador:
+              <span x-text="j.ganhador.nome"></span>
+            </p>
+          </details>
+        </template>
+      </details>
+
+      <details>
+        <summary class="button">Administradores</summary>
+        <button @click="adicionarAdministrador">Adicionar</button>
+        <template x-for="a in administradores">
+          <details>
+            <summary x-text="a.nome"></summary>
+            <p>
+              Telefone:
+              <span x-text="a.telefone"></span>
+              <br />
+              Estado:
+              <span x-text="a.estado"></span>
+              <br />
+              Município
+              <span x-text="a.municipio"></span>
+            </p>
+            <button @click="removerAdministrador(a.id)">Remover</button>
+          </details>
+        </template>
+      </details>
+
+      <details>
+        <summary class="button">Usuários comuns</summary>
+        <template x-for="u in usuarios">
+          <details>
+            <summary x-text="a.nome"></summary>
+            <p>
+              Telefone:
+              <span x-text="a.telefone"></span>
+              <br />
+              Estado:
+              <span x-text="a.estado"></span>
+              <br />
+              Município
+              <span x-text="a.municipio"></span>
+            </p>
+          </details>
+        </template>
+      </details>
+      <button>Encerrar sessão</button>
     </main>
   </body>
 </html>
