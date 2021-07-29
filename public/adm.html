@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/jpg" href="assets/logo.jpg" />
+    <link rel="icon" type="image/png" href="assets/logo.png" />
     <title>Administração</title>
 
     <!-- Milligram CSS -->
@@ -35,7 +35,7 @@
   <body>
     <header class="container">
       <h3>Administração</h3>
-    </header>
+    </header> 
     <main class="container" x-data="admin">
       <p>
         Logado no momento com o número
@@ -49,7 +49,7 @@
       <details>
         <summary class="button">Jogos</summary>
         <h5>Gerenciamento de jogos</h5>
-        <template x-if="jogoRodando">
+        <div x-show="jogoRodando">
           <div x-show="jogoGerenciavel">
             <button class="button-outline" @click="encerrarJogo">
               Cancelar jogo
@@ -59,8 +59,8 @@
             </button>
             <p>
               Números chamados:
-              <em x-text="ultimosNumeros"></em>
-              <br />
+              <em x-text="ultimosNumeros"></em></p>
+            <p>
               Último número:
               <em x-text="ultimoNumero"></em>
             </p>
@@ -72,7 +72,7 @@
           <div x-show="! jogoGerenciavel">
             <p>Um jogo está em execução neste momento.</p>
           </div>
-        </template>
+        </div>
         <div x-show="! jogoRodando">
           <button class="button-outline" @click="novoJogo">Criar jogo</button>
         </div>

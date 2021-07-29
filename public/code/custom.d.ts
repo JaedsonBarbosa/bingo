@@ -25,8 +25,7 @@ interface ICartela {
   numeros: number[]
 }
 
-interface ICartelaExtendida {
-  ganhou: boolean
+interface ICartelaExtendida extends ICartela {
   b: number[]
   i: number[]
   n: number[]

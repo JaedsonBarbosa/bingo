@@ -3,3 +3,7 @@
 h3 {
   margin-top: 4rem;
 }
+
+template {
+  display: none;
+}

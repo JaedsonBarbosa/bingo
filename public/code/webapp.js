@@ -27,10 +27,17 @@ document.addEventListener('alpine:init', () => {
 
     /** @type {IJogo} */
     jogo: undefined,
-    jogoRodando: false,
-    jogoParticipando: false,
+
     /** @type {ICartelaExtendida} */
     cartela: undefined,
+
+    get jogoRodando() {
+      return !!this.jogo
+    },
+
+    get jogoParticipando() {
+      return !!this.cartela
+    },
 
     get jogoIniciado() {
       return this.jogo?.numeros.length > 0
@@ -45,9 +52,16 @@ document.addEventListener('alpine:init', () => {
       b.forEach(defAdd)
       i.forEach(defAdd)
       n.forEach((v, i) => linhas[i < 2 ? i : i + 1].push(v))
+      linhas[2].push(-1)
       g.forEach(defAdd)
       o.forEach(defAdd)
       return linhas
+    },
+
+    get reversoNumeros() {
+      const nums = this.jogo?.numeros
+      if (!nums?.length) return []
+      return nums.slice().reverse()
     },
 
     get ultimosNumeros() {
@@ -84,7 +98,6 @@ document.addEventListener('alpine:init', () => {
       jogo.onSnapshot(async (j) => {
         if (j.exists) {
           this.jogo = j.data()
-          this.jogoRodando = true
           if (!this.cancelarMonitoramentoCartela) this.monitorarCartela()
         } else {
           if (this.jogoParticipando) {
@@ -96,8 +109,6 @@ document.addEventListener('alpine:init', () => {
             }
           }
           this.jogo = undefined
-          this.jogoRodando = false
-          this.jogoParticipando = false
           this.cartela = undefined
           this.cancelarMonitoramentoCartela?.()
         }
@@ -113,9 +124,8 @@ document.addEventListener('alpine:init', () => {
           if (!doc.exists) return
           /** @type {ICartela} */
           const cartela = doc.data()
-          this.jogoParticipando = true
           if (!this.cartela) {
-            const nums = cartela.numeros
+            const nums = cartela.numeros.sort((a, b) => a - b)
             const b = nums.filter((v) => numsB.includes(v))
             const i = nums.filter((v) => numsI.includes(v))
             const n = nums.filter((v) => numsN.includes(v))
@@ -146,7 +156,10 @@ document.addEventListener('alpine:init', () => {
        * @param {number} quant
        */
       function getAleatorios(nums, quant) {
-        return nums.sort(() => Math.random() * 2 - 1).slice(0, quant)
+        return nums
+          .sort(() => Math.random() * 2 - 1)
+          .slice(0, quant)
+          .sort((a, b) => a - b)
       }
 
       const b = getAleatorios(numsB, 5)
