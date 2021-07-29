@@ -1,4 +1,6 @@
 document.addEventListener('alpine:init', () => {
+  const login = './login.html?admin'
+
   async function carregarUsuarios(admin = true) {
     const res = await usuarios.where('admin', '==', admin).get()
     return res.empty ? [] : res.docs.map((v) => ({ ...v.data(), id: v.id }))
@@ -13,7 +15,7 @@ document.addEventListener('alpine:init', () => {
 
     encerrarSessao() {
       auth.signOut()
-      window.location.replace('./login.html?admin')
+      window.location.replace(login)
     },
 
     /** @type {IJogo} */
@@ -71,17 +73,17 @@ document.addEventListener('alpine:init', () => {
         auth.onAuthStateChanged((v) => res(v))
       )
       if (!user) {
-        window.location.replace('./login.html')
+        window.location.replace(login)
         return
       }
       const doc = await usuarios.doc(user.uid).get()
       if (!doc.exists) {
-        window.location.replace('./login.html')
+        window.location.replace(login)
         return
       }
       const data = doc.data()
       if (!isAdmin(data, doc.id)) {
-        window.location.replace('./webapp.html')
+        window.location.replace('./app.html')
         return
       }
       this.userDB = data
@@ -99,7 +101,7 @@ document.addEventListener('alpine:init', () => {
           const gerenciavel =
             this.jogo.organizador.telefone == this.userDB.telefone
           this.jogoGerenciavel = gerenciavel
-          if (gerenciavel && !this.cancelarMonitoramentoCartelas) monitorarCartelas()
+          if (gerenciavel && !this.cancelarMonitoramentoCartelas) this.monitorarCartelas()
         } else {
           this.jogo = undefined
           this.jogoRodando = false

@@ -2,7 +2,7 @@ document.addEventListener('alpine:init', () => {
   const params = new URLSearchParams(window.location.search)
   const adminRequest = params.has('admin')
 
-  const webapp = './webapp.html'
+  const webapp = './app.html'
 
   Alpine.data('login', () => ({
     exibir: false,

@@ -76,17 +76,18 @@
         <div x-show="! jogoRodando">
           <button class="button-outline" @click="novoJogo">Criar jogo</button>
         </div>
-
-        <h5>Histórico de jogos</h5>
-        <template x-for="j in jogos">
-          <details>
-            <summary x-text="j.titulo"></summary>
-            <p>
-              Ganhador:
-              <span x-text="j.ganhador.nome"></span>
-            </p>
-          </details>
-        </template>
+        <div x-show="jogos.length">
+          <h5>Histórico de jogos</h5>
+          <template x-for="j in jogos">
+            <details>
+              <summary x-text="j.titulo"></summary>
+              <p>
+                Ganhador:
+                <span x-text="j.ganhador.nome"></span>
+              </p>
+            </details>
+          </template>
+        </div>
       </details>
       <hr />
       <details>

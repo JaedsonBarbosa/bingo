@@ -20,20 +20,6 @@
   "hosting": {
     "public": "public",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-    "rewrites": [
-      {
-        "source": "/app",
-        "destination": "/web-build/index.html"
-      },
-      {
-        "source": "/app/**",
-        "destination": "/web-build/index.html"
-      },
-      {
-        "source": "/web-build/**",
-        "destination": "/web-build/index.html"
-      }
-    ],
     "headers": [
       {
         "source": "/**",

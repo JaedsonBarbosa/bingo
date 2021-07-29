@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/jpg" href="assets/logo.jpg" />
+    <title>Voice Bingo</title>
+
+    <!-- Milligram CSS -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css"
+    />
+
+    <script src="/__/firebase/8.6.5/firebase-app.js"></script>
+    <script src="/__/firebase/8.6.5/firebase-auth.js"></script>
+    <script src="/__/firebase/8.6.5/firebase-firestore.js"></script>
+    <script src="/__/firebase/init.js?useEmulator=true"></script>
+
+    <link rel="stylesheet" href="style/global.css" />
+    <link rel="stylesheet" href="style/webapp.css" />
+
+    <script defer src="https://unpkg.com/alpinejs"></script>
+    <script src="code/commom.js"></script>
+    <script src="code/webapp.js"></script>
+  </head>
+  <body>
+    <header class="container">
+      <h3>Voice Bingo</h3>
+    </header>
+    <main class="container" x-data="webapp">
+      <p>
+        Logado no momento com o número
+        <span x-text="telefone"></span>
+        .
+      </p>
+      <!-- Eh, seria interessante usar uma ferramenta de template -->
+      <!-- O PUG talvez fosse bem útil para simplificar tudo por aqui -->
+      <button class="button-outline" @click="encerrarSessao">
+        Encerrar sessão
+      </button>
+
+      <template x-if="jogoRodando">
+        <hr />
+        <h5>Jogo</h5>
+        <div x-show="jogoParticipando">
+          <p>
+            Números chamados:
+            <em x-text="ultimosNumeros"></em>
+            <br />
+            Último número:
+            <em x-text="ultimoNumero"></em>
+          </p>
+          <table>
+            <thead>
+              <th>B</th>
+              <th>I</th>
+              <th>N</th>
+              <th>G</th>
+              <th>O</th>
+            </thead>
+            <tbody>
+              <template x-for="l in linhasCartela">
+                <tr>
+                  <template x-for="c in l">
+                    <td
+                      x-data="{ marcado: false }"
+                      x-text="c"
+                      :class="marcado && 'marcado'"
+                    ></td>
+                  </template>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+          <button @click="bingo">BINGO</button>
+        </div>
+        <div x-show="! jogoParticipando">
+          <div x-show="jogoRodando">
+            <p>
+              Um jogo está em execução neste momento, mas você não está
+              participando.
+            </p>
+          </div>
+          <div x-show="! jogoRodando">
+            <p>
+              Um jogo está prester a começar, se desejas participar, basta
+              clicar no botão abaixo.
+            </p>
+            <button @click="participar"></button>
+          </div>
+        </div>
+      </template>
+      <div x-show="jogos.length">
+        <hr />
+        <h5>Histórico de jogos</h5>
+        <template x-for="j in jogos">
+          <details>
+            <summary x-text="j.titulo"></summary>
+            <p>
+              Ganhador:
+              <span x-text="j.ganhador.nome"></span>
+            </p>
+          </details>
+        </template>
+      </div>
+    </main>
+  </body>
+</html>
