@@ -95,59 +95,43 @@ document.addEventListener('alpine:init', () => {
     },
 
     monitorarJogo() {
+      // Analisar forma de sorteamento de números dos números para fazer algo mais eficiente no admin
+      // Fazer também uma exibição mais elegante em forma de tabela dos números chamados
       jogo.onSnapshot(async (j) => {
         if (j.exists) {
           this.jogo = j.data()
-          if (!this.cancelarMonitoramentoCartela) this.monitorarCartela()
-        } else {
-          if (this.jogoParticipando) {
-            this.jogos = await carregarJogos()
-            if (this.jogos[0]?.ganhador.id == auth.currentUser.uid) {
-              alert('Parabéns! Você ganhou.')
-            } else {
-              alert('Que pena, você perdeu.')
-            }
-          }
-          this.jogo = undefined
-          this.cartela = undefined
-          this.cancelarMonitoramentoCartela?.()
-        }
-      })
-    },
-
-    /** @type {() => void} */
-    cancelarMonitoramentoCartela: undefined,
-    monitorarCartela() {
-      this.cancelarMonitoramentoCartela = cartelas
-        .doc(auth.currentUser.uid)
-        .onSnapshot(async (doc) => {
-          if (!doc.exists) return
-          /** @type {ICartela} */
-          const cartela = doc.data()
           if (!this.cartela) {
-            const nums = cartela.numeros.sort((a, b) => a - b)
+            const doc = await cartelas.doc(auth.currentUser.uid).get()
+            const { ganhou, numeros } = doc.data()
+            const nums = numeros.sort((a, b) => a - b)
             const b = nums.filter((v) => numsB.includes(v))
             const i = nums.filter((v) => numsI.includes(v))
             const n = nums.filter((v) => numsN.includes(v))
             const g = nums.filter((v) => numsG.includes(v))
             const o = nums.filter((v) => numsO.includes(v))
-            this.cartela = { ganhou: cartela.ganhou, b, i, n, g, o }
+            this.cartela = { ganhou, numeros, b, i, n, g, o }
             return
           }
-          if (this.cartela.ganhou && !cartela.ganhou) {
-            const engano =
-              'Você errou, faltam os números ' +
-              numsCartela.filter((n) => !numsJogo.includes(n)).join(', ') +
-              ' serem chamados.'
-            alert(engano)
-          }
-          this.cartela.ganhou = cartela.ganhou
-        })
+        } else {
+          this.jogo = undefined
+          this.cartela = undefined
+        }
+      })
     },
 
     async bingo() {
-      await cartelas.doc(auth.currentUser.uid).update({ ganhou: true })
-      alert('Aguardando análise...')
+      const numsCartela = this.cartela.numeros
+      const numsJogo = this.jogo.numeros
+      if (numsCartela.some((v) => !numsJogo.includes(v))) {
+        const engano =
+          'Você errou, faltam os números ' +
+          numsCartela.filter((n) => !numsJogo.includes(n)).join(', ') +
+          ' serem chamados.'
+        alert(engano)
+      } else {
+        await cartelas.doc(auth.currentUser.uid).update({ ganhou: true })
+        alert('Parabéns, você ganhou!')
+      }
     },
 
     async participar() {
@@ -156,8 +140,8 @@ document.addEventListener('alpine:init', () => {
        * @param {number} quant
        */
       function getAleatorios(nums, quant) {
+        misturar(nums)
         return nums
-          .sort(() => Math.random() * 2 - 1)
           .slice(0, quant)
           .sort((a, b) => a - b)
       }
@@ -169,8 +153,9 @@ document.addEventListener('alpine:init', () => {
       const o = getAleatorios(numsO, 5)
 
       const ganhou = false
-      const cartelaExpandida = { ganhou, b, i, n, g, o }
-      const cartela = { ganhou, numeros: [...b, ...i, ...n, ...g, ...o] }
+      const numeros = [...b, ...i, ...n, ...g, ...o]
+      const cartelaExpandida = { ganhou, numeros, b, i, n, g, o }
+      const cartela = { ganhou, numeros }
       await cartelas.doc(auth.currentUser.uid).set(cartela)
       this.cartela = cartelaExpandida
     },

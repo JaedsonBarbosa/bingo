@@ -22,7 +22,6 @@ document.addEventListener('alpine:init', () => {
     jogo: undefined,
     jogoRodando: false,
     jogoGerenciavel: false,
-    engano: '',
 
     /** @type {IUsuario[]} */
     administradores: [],
@@ -105,7 +104,6 @@ document.addEventListener('alpine:init', () => {
         } else {
           this.jogo = undefined
           this.jogoRodando = false
-          this.engano = ''
           this.cancelarMonitoramentoCartelas?.()
         }
       })
@@ -121,27 +119,14 @@ document.addEventListener('alpine:init', () => {
           if (!doc) return
           /** @type {ICartela} */
           const cartela = doc.data()
-          const numsJogo = this.jogo.numeros
-          const numsCartela = cartela.numeros
-          if (numsCartela.every((k) => numsJogo.includes(k))) {
-            // Temos um ganhador
-            const userDB = await usuarios.doc(doc.id).get()
-            const registro = {
-              ...this.jogo,
-              ganhador: { id: doc.id, ...userDB.data() },
-              data: firebase.firestore.FieldValue.serverTimestamp(),
-            }
-            await jogos.add(registro)
-            await this.encerrarJogo(false)
-            encerrar()
-          } else {
-            // Temos um afobado
-            this.engano =
-              'Alguém apertou Bingo faltando ' +
-              numsCartela.filter((n) => !numsJogo.includes(n)).join(', ') +
-              ' serem chamados.'
-            doc.ref.update({ ganhou: false })
+          const userDB = await usuarios.doc(doc.id).get()
+          const registro = {
+            ...this.jogo,
+            ganhador: { id: doc.id, ...userDB.data() },
+            data: firebase.firestore.FieldValue.serverTimestamp(),
           }
+          await jogos.add(registro)
+          await this.encerrarJogo(false)
         })
     },
 

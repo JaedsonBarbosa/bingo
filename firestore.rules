@@ -80,8 +80,18 @@ service cloud.firestore {
         return getJogoAtivo().numeros.size() == 0;
       }
 
-      function updateValido() {
+      function mudouApenasGanhou() {
         return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ganhou']);
+      }
+
+      function naoGanhou() {
+        return !request.resource.data.ganhou;
+      }
+
+      function realmenteGanhou() {
+        let jogo = getJogoAtivo();
+        let cartela = resource.data;
+        return jogo.numeros.hasAll(cartela.numeros);
       }
 
       function numerosValidos(numeros) {
@@ -113,7 +123,9 @@ service cloud.firestore {
         && cartelaValida()
         && existeJogoAtivo()
         && jogoAindaNaoIniciou();
-      allow update: if (mesmoIdAntigo() || isAdmin()) && updateValido();
+      allow update: if (mesmoIdAntigo() || isAdmin())
+        && mudouApenasGanhou()
+        && (naoGanhou() || realmenteGanhou());
       allow delete: if isAdmin();
     }
 

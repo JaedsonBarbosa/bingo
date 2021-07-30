@@ -13,3 +13,12 @@ async function carregarJogos() {
 function isAdmin(data, id) {
   return data.admin || id === 'zFL8Cz8fF4mHEgLpL4u8RgTOqt7e'
 }
+
+function misturar(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * i)
+    const temp = array[i]
+    array[i] = array[j]
+    array[j] = temp
+  }
+}
