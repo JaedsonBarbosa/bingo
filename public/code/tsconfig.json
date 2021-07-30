@@ -1,7 +1,0 @@
-{
-  "compilerOptions": {
-    "allowJs": true,
-    "outDir": "./out",
-    "target": "ES2020"
-  }
-}

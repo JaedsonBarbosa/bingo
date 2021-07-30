@@ -1,6 +1,21 @@
 {
   "scripts": {
-    "emulator": "firebase emulators:start --import .save-data --export-on-exit",
+    "postinstall": "patch-package",
+    "start": "run-p start:*",
+    "start:parcel": "parcel watch src/index.html --dist-dir public",
+    "start:firebase": "firebase emulators:start --import .save-data --export-on-exit",
     "deploy": "firebase deploy"
+  },
+  "devDependencies": {
+    "@parcel/transformer-sass": "^2.0.0-beta.3.1",
+    "npm-check-updates": "^11.8.3",
+    "parcel": "^2.0.0-beta.3.1",
+    "patch-package": "^6.4.7"
+  },
+  "dependencies": {
+    "alpinejs": "^3.2.2",
+    "firebase": "^8.8.1",
+    "firebaseui": "^4.8.1",
+    "milligram": "^1.4.1"
   }
 }

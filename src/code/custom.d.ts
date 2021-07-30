@@ -1,5 +1,5 @@
-type TData = firebase.firestore.DocumentData
-type TDocument = firebase.firestore.DocumentReference<TData>
+type TData = firebase.default.firestore.DocumentData
+type TDocument = firebase.default.firestore.DocumentReference<TData>
 
 interface IUsuario {
   admin?: boolean
@@ -16,7 +16,7 @@ interface IJogo {
 }
 
 interface IJogoAntigo extends IJogo {
-  data: firebase.firestore.Timestamp
+  data: firebase.default.firestore.Timestamp
   ganhador: IUsuario & { id: string }
 }
 

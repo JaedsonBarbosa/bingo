@@ -3,3 +3,5 @@ node_modules/
 .save-data/
 web-build/
 *.log
+.parcel-cache
+public

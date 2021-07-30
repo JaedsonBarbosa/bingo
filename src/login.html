@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="assets/logo.png" />
+    <title>Login</title>
+
+    <link rel="stylesheet" href="style/login.scss" />
+    <script type="module" src="code/login.ts"></script>
+  </head>
+  <body>
+    <div id="loginDialog"></div>
+    <main class="container" x-data="login" x-cloak x-show="exibir">
+      <h3>Cadastro</h3>
+      <form @submit.prevent="atualizar">
+        <label>
+          Nome
+          <input x-model="nome" minlength="2" />
+        </label>
+        <label>
+          Estado
+          <input x-model="estado" minlength="2" />
+        </label>
+        <label>
+          Município
+          <input x-model="municipio" minlength="2" />
+        </label>
+        <input type="submit" />
+      </form>
+    </main>
+  </body>
+</html>
