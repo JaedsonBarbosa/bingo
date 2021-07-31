@@ -17,7 +17,8 @@ Alpine.data('login', () => ({
   init() {
     auth.onAuthStateChanged(async (v) => {
       if (!v) {
-        const loginDialog = document.querySelector('#loginDialog')
+        const idContainer = '#loginDialog'
+        const loginDialog = document.querySelector(idContainer)
         if (!loginDialog) return
         const ui = new firebaseui.auth.AuthUI(auth)
         const params: any = {
@@ -34,7 +35,7 @@ Alpine.data('login', () => ({
             },
           ],
         }
-        ui.start('#loginDialog', params)
+        ui.start(idContainer, params)
         return
       }
       const doc = await usuarios.doc(v.uid).get()

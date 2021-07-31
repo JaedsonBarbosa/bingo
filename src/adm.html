@@ -13,21 +13,25 @@
   <body>
     <header class="container">
       <h3>Administração</h3>
-    </header> 
-    <main class="container" x-data="admin">
+    </header>
+    <main class="container" x-data="admin" x-cloak>
       <p>
         Logado no momento com o número
-        <span x-text="userDB?.telefone"></span>
+        <span x-text="telefone"></span>
         .
       </p>
       <button class="button-outline" @click="encerrarSessao">
         Encerrar sessão
       </button>
+      <a class="button button-outline" href="app.html">
+        Sair do painel administrativo
+      </a>
+
       <hr />
       <details>
         <summary class="button">Jogos</summary>
         <h5>Gerenciamento de jogos</h5>
-        <div x-show="jogoRodando">
+        <div x-show="jogo">
           <div x-show="jogoGerenciavel">
             <button class="button-outline" @click="encerrarJogo">
               Cancelar jogo
@@ -37,7 +41,8 @@
             </button>
             <p>
               Números chamados:
-              <em x-text="ultimosNumeros"></em></p>
+              <em x-text="ultimosNumeros"></em>
+            </p>
             <p>
               Último número:
               <em x-text="ultimoNumero"></em>
@@ -47,7 +52,7 @@
             <p>Um jogo está em execução neste momento.</p>
           </div>
         </div>
-        <div x-show="! jogoRodando">
+        <div x-show="! jogo">
           <button class="button-outline" @click="novoJogo">Criar jogo</button>
         </div>
         <div x-show="jogos.length">

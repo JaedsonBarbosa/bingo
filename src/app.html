@@ -15,18 +15,19 @@
     <header class="container">
       <h3>Voice Bingo</h3>
     </header>
-    <main class="container" x-data="webapp">
+    <main class="container" x-data="webapp" x-cloak>
       <p>
         Logado no momento com o número
         <span x-text="telefone"></span>
         .
       </p>
-      <!-- Eh, seria interessante usar uma ferramenta de template -->
-      <!-- O PUG talvez fosse bem útil para simplificar tudo por aqui -->
+
       <button class="button-outline" @click="encerrarSessao">
         Encerrar sessão
       </button>
-      <a href="adm.html">Acessar painel administrativo</a>
+      <a x-show="isAdmin" class="button button-outline" href="adm.html">
+        Acessar painel administrativo
+      </a>
 
       <div x-show="jogo">
         <hr />

@@ -1,4 +1,4 @@
-import firebase from 'firebase'
+import firebase from 'firebase/app'
 import 'firebase/auth'
 import 'firebase/firestore'
 
@@ -14,8 +14,6 @@ var firebaseConfig = {
 firebase.initializeApp(firebaseConfig)
 firebase.firestore().useEmulator('localhost', 8080)
 firebase.auth().useEmulator('http://localhost:9099')
-
-window.firebase = firebase as any
 
 export const PhoneProvider = firebase.auth.PhoneAuthProvider.PROVIDER_ID
 export const FieldValue = firebase.firestore.FieldValue
