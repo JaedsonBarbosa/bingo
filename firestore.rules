@@ -25,7 +25,7 @@ service cloud.firestore {
     }
 
     function isAdmin() {//SwHkTu4OPmd42zhPKzYa5Wh3Y6i2
-      return request.auth.uid == 'zFL8Cz8fF4mHEgLpL4u8RgTOqt7e' || getAdmin(buscarUsuario());
+      return request.auth.uid == 'hhSt3z6SqfXqUqFoiEM5W6hfy0Kf' || getAdmin(buscarUsuario());
     }
 
     function organizadorValido(organizador) {
@@ -167,7 +167,7 @@ service cloud.firestore {
         return request.resource.id == request.auth.uid;
       }
 
-      allow read: if resource.id == request.auth.uid || isAdmin();
+      allow read: if resource == null || resource.id == request.auth.uid || isAdmin();
       allow create: if mesmoId() && usuarioValido(false);
       allow update: if (mesmoId() && usuarioValido(getAdmin(resource.data)))
         || (isAdmin() && usuarioValido(true));

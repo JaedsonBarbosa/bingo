@@ -31,7 +31,7 @@ export async function carregarJogos() {
 }
 
 export function isAdmin(data: IUsuario, id: string) {
-  return data.admin || id === 'zFL8Cz8fF4mHEgLpL4u8RgTOqt7e'
+  return data.admin || id === 'hhSt3z6SqfXqUqFoiEM5W6hfy0Kf'
 }
 
 export function misturar(array: number[]) {

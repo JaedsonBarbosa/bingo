@@ -21,6 +21,8 @@ const encerrar = auth.onAuthStateChanged(async (user) => {
     openLogin()
     return
   }
+  //Remover analise se está no DB (pois teoricamente, deve estar)
+  //Pôr botão para editar dados cadastrais
   Alpine.data('webapp', webapp)
   Alpine.start()
 })

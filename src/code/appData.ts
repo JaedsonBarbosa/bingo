@@ -19,13 +19,7 @@ const numsG = getNumeros(3)
 const numsO = getNumeros(4)
 
 export default () => ({
-  get isAdmin() {
-    const user = auth.currentUser!
-    return usuarios
-      .doc(user.uid)
-      .get()
-      .then((v) => isAdmin(v.data() as IUsuario, user.uid))
-  },
+  isAdmin: false,
 
   jogos: [] as IJogoAntigo[],
 
@@ -114,15 +108,22 @@ export default () => ({
   },
 
   init() {
+    const user = auth.currentUser!
+    usuarios
+      .doc(user.uid)
+      .get()
+      .then((v) => (this.isAdmin = isAdmin(v.data() as IUsuario, user.uid)))
     jogos
       .orderBy('data', 'desc')
       .limit(10)
-      .onSnapshot((v) => (this.jogos = v.docs.map((k) => k.data() as IJogoAntigo)))
+      .onSnapshot(
+        (v) => (this.jogos = v.docs.map((k) => k.data() as IJogoAntigo))
+      )
     jogo.onSnapshot(async (j) => {
       if (j.exists) {
         this.jogo = j.data() as IJogo
         if (!this.cartela) {
-          const doc = await cartelas.doc(auth.currentUser!.uid).get()
+          const doc = await cartelas.doc(user!.uid).get()
           if (!doc.exists) return
           const { ganhou, numeros } = doc.data() as ICartela
           const nums = numeros.sort((a, b) => a - b)

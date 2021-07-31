@@ -13,10 +13,12 @@ Alpine.data('login', () => ({
   nome: '',
   estado: '',
   municipio: '',
+  iniciadoLogado: true,
 
   init() {
     auth.onAuthStateChanged(async (v) => {
       if (!v) {
+        this.iniciadoLogado = false
         const idContainer = '#loginDialog'
         const loginDialog = document.querySelector(idContainer)
         if (!loginDialog) return
@@ -44,11 +46,13 @@ Alpine.data('login', () => ({
         return
       }
       const data = doc.data() as IUsuario
-      this.telefone = v.phoneNumber!
-      this.nome = data.nome
-      this.estado = data.estado
-      this.municipio = data.municipio
-      if (isAdmin(data, v.uid)) {
+      if (this.iniciadoLogado) {
+        this.telefone = v.phoneNumber!
+        this.nome = data.nome
+        this.estado = data.estado
+        this.municipio = data.municipio
+        this.exibir = true
+      } else if (isAdmin(data, v.uid)) {
         window.location.replace(adminRequest ? './adm.html' : webapp)
       } else {
         if (adminRequest) alert('Você não é um administrador.')
