@@ -5,10 +5,20 @@ import {
 import webapp from './appData'
 import Alpine from 'alpinejs'
 
+function openLogin() {
+  window.location.replace('./login.html?admin')
+}
+
 const encerrar = auth.onAuthStateChanged(async (user) => {
-  if (!user || !(await usuarios.doc(user.uid).get()).exists) {
+  if (!user) {
     encerrar()
-    window.location.replace('./login.html')
+    openLogin()
+    return
+  }
+  const doc = await usuarios.doc(user.uid).get()
+  if (!doc?.exists) {
+    encerrar()
+    openLogin()
     return
   }
   Alpine.data('webapp', webapp)

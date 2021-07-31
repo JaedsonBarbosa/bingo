@@ -20,14 +20,14 @@ const numsO = getNumeros(4)
 
 export default () => ({
   get isAdmin() {
-    const user = auth.currentUser
+    const user = auth.currentUser!
     return usuarios
       .doc(user.uid)
       .get()
-      .then((v) => isAdmin(v.data(), user.uid))
+      .then((v) => isAdmin(v.data() as IUsuario, user.uid))
   },
 
-  jogos: [],
+  jogos: [] as IJogoAntigo[],
 
   encerrarSessao() {
     auth.signOut()
@@ -37,18 +37,15 @@ export default () => ({
     return auth.currentUser?.phoneNumber
   },
 
-  /** @type {IJogo} */
-  jogo: undefined,
-
-  /** @type {ICartelaExtendida} */
-  cartela: undefined,
+  jogo: undefined as IJogo | undefined,
+  cartela: undefined as ICartelaExtendida | undefined,
 
   get linhasCartela() {
     if (!this?.cartela) return []
     /** @type {number[][]} */
-    const linhas = [[], [], [], [], []]
+    const linhas: number[][] = [[], [], [], [], []]
     const { b, i, n, g, o } = this.cartela
-    const defAdd = (v, i) => linhas[i].push(v)
+    const defAdd = (v: number, i: number) => linhas[i].push(v)
     b.forEach(defAdd)
     i.forEach(defAdd)
     n.forEach((v, i) => linhas[i < 2 ? i : i + 1].push(v))
@@ -77,6 +74,7 @@ export default () => ({
   },
 
   async bingo() {
+    if (!this.cartela || !this.jogo) return
     const numsCartela = this.cartela.numeros
     const numsJogo = this.jogo.numeros
     if (numsCartela.some((v) => !numsJogo.includes(v))) {
@@ -86,7 +84,7 @@ export default () => ({
         ' serem chamados.'
       alert(engano)
     } else {
-      await cartelas.doc(auth.currentUser.uid).update({ ganhou: true })
+      await cartelas.doc(auth.currentUser!.uid).update({ ganhou: true })
       alert('Parabéns, você ganhou!')
     }
   },
@@ -96,7 +94,7 @@ export default () => ({
      * @param {number[]} nums
      * @param {number} quant
      */
-    function getAleatorios(nums, quant) {
+    function getAleatorios(nums: number[], quant: number) {
       misturar(nums)
       return nums.slice(0, quant).sort((a, b) => a - b)
     }
@@ -111,7 +109,7 @@ export default () => ({
     const numeros = [...b, ...i, ...n, ...g, ...o]
     const cartelaExpandida = { ganhou, numeros, b, i, n, g, o }
     const cartela = { ganhou, numeros }
-    await cartelas.doc(auth.currentUser.uid).set(cartela)
+    await cartelas.doc(auth.currentUser!.uid).set(cartela)
     this.cartela = cartelaExpandida
   },
 
@@ -119,14 +117,14 @@ export default () => ({
     jogos
       .orderBy('data', 'desc')
       .limit(10)
-      .onSnapshot((v) => (this.jogos = v.docs.map((k) => k.data())))
+      .onSnapshot((v) => (this.jogos = v.docs.map((k) => k.data() as IJogoAntigo)))
     jogo.onSnapshot(async (j) => {
       if (j.exists) {
-        this.jogo = j.data()
+        this.jogo = j.data() as IJogo
         if (!this.cartela) {
-          const doc = await cartelas.doc(auth.currentUser.uid).get()
+          const doc = await cartelas.doc(auth.currentUser!.uid).get()
           if (!doc.exists) return
-          const { ganhou, numeros } = doc.data()
+          const { ganhou, numeros } = doc.data() as ICartela
           const nums = numeros.sort((a, b) => a - b)
           const b = nums.filter((v) => numsB.includes(v))
           const i = nums.filter((v) => numsI.includes(v))

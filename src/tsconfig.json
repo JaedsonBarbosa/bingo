@@ -3,5 +3,8 @@
     "allowJs": true,
     "target": "ES6",
     "moduleResolution": "node",
+    "strict": true,
+    "alwaysStrict": true,
+    "outDir": "out"
   }
 }

@@ -1,8 +1,16 @@
-import { auth, cartelas, db, jogo, jogos, FieldValue, usuarios } from './commom'
+import {
+  auth,
+  cartelas,
+  db,
+  jogo,
+  jogos,
+  FieldValue,
+  usuarios,
+  misturar,
+} from './commom'
 
 export default () => ({
-  /** @type {IJogoAntigo[]} */
-  jogos: [],
+  jogos: [] as IJogoAntigo[],
 
   encerrarSessao() {
     auth.signOut()
@@ -12,12 +20,12 @@ export default () => ({
     return auth.currentUser?.phoneNumber
   },
 
-  /** @type {IJogo} */
-  jogo: undefined,
+  jogo: undefined as IJogo | undefined,
   jogoGerenciavel: false,
+  proximosNumeros: [] as number[],
 
-  administradores: [],
-  usuarios: [],
+  administradores: [] as IUsuarioExtendido[],
+  usuarios: [] as IUsuarioExtendido[],
 
   async adicionarAdministrador() {
     const telefone = prompt('Número de telefone:')
@@ -34,7 +42,7 @@ export default () => ({
     alert('Adicionado administrador.')
   },
 
-  async removerAdministrador(id) {
+  async removerAdministrador(id: string) {
     await usuarios.doc(id).update({ admin: false })
     const index = this.administradores.findIndex((v) => v.id == id)
     this.administradores.splice(index, 1)
@@ -67,7 +75,7 @@ export default () => ({
     const titulo = prompt('Titulo do jogo:')
     if (!titulo) alert('Operação cancelada.')
     else {
-      const userDB = await usuarios.doc(auth.currentUser.uid).get()
+      const userDB = await usuarios.doc(auth.currentUser!.uid).get()
       /** @type {IJogo} */
       const novo = {
         titulo,
@@ -79,35 +87,45 @@ export default () => ({
   },
 
   async chamarNumero() {
-    let numero = 0
-    const nums = this.jogo.numeros
-    if (nums.length == 75) {
-      alert('Todos os números já foram chamados.')
-      return
-    }
-    do {
-      numero = 1 + Math.floor(Math.random() * 75)
-    } while (nums.includes(numero))
-    const numeros = FieldValue.arrayUnion(numero)
-    await jogo.update({ numeros })
+    if (!this.proximosNumeros.length) return
+    let numero = this.proximosNumeros[0]
+    await jogo.update({ numeros: FieldValue.arrayUnion(numero) })
   },
 
   init() {
     jogos
       .orderBy('data', 'desc')
       .limit(10)
-      .onSnapshot((v) => (this.jogos = v.docs.map((k) => k.data())))
+      .onSnapshot(
+        (v) => (this.jogos = v.docs.map((k) => k.data() as IJogoAntigo))
+      )
+    const mapUser = (v: TSnapshot) => ({ ...(v.data() as IUsuario), id: v.id })
     usuarios
       .where('admin', '==', true)
-      .onSnapshot((v) => (this.administradores = v.docs.map((k) => k.data())))
+      .onSnapshot((v) => (this.administradores = v.docs.map(mapUser)))
     usuarios
       .where('admin', '==', false)
-      .onSnapshot((v) => (this.usuarios = v.docs.map((k) => k.data())))
+      .onSnapshot((v) => (this.usuarios = v.docs.map(mapUser)))
     jogo.onSnapshot((j) => {
-      const jogo = j.data()
+      const jogo = j.data() as IJogo
       this.jogo = jogo
-      this.jogoGerenciavel =
-        this.jogo?.organizador.telefone == auth.currentUser.phoneNumber
+      const telOrganizador = this.jogo?.organizador.telefone
+      const telUser = auth.currentUser!.phoneNumber
+      const gerenciavel = telOrganizador == telUser
+      this.jogoGerenciavel = gerenciavel
+      if (gerenciavel) {
+        const nJogo = jogo.numeros
+        if (nJogo.length == 75) {
+          alert('Todos os números já foram chamados.')
+          return
+        }
+        let proximos = this.proximosNumeros
+        if (!proximos.length) {
+          proximos = [...Array(75)].map((_, i) => i + 1)
+          misturar(proximos)
+        }
+        this.proximosNumeros = proximos.filter((v) => !nJogo.includes(v))
+      } else this.proximosNumeros = []
     })
     cartelas.where('ganhou', '==', true).onSnapshot(async (v) => {
       const doc = v.docs[0]

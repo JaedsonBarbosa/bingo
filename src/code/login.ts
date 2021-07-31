@@ -43,8 +43,8 @@ Alpine.data('login', () => ({
         this.exibir = true
         return
       }
-      const data = doc.data()
-      this.telefone = v.phoneNumber
+      const data = doc.data() as IUsuario
+      this.telefone = v.phoneNumber!
       this.nome = data.nome
       this.estado = data.estado
       this.municipio = data.municipio
@@ -58,7 +58,7 @@ Alpine.data('login', () => ({
   },
 
   async atualizar() {
-    await usuarios.doc(auth.currentUser.uid).set(
+    await usuarios.doc(auth.currentUser!.uid).set(
       {
         telefone: this.telefone,
         nome: this.nome,

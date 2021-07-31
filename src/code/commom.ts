@@ -30,7 +30,7 @@ export async function carregarJogos() {
   return res.docs.map((v) => v.data())
 }
 
-export function isAdmin(data, id) {
+export function isAdmin(data: IUsuario, id: string) {
   return data.admin || id === 'zFL8Cz8fF4mHEgLpL4u8RgTOqt7e'
 }
 
