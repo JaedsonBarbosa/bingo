@@ -38,11 +38,14 @@
         <div x-show="cartela">
           <p>
             Números chamados:
-            <em x-text="ultimosNumeros"></em>
+            <em
+              x-data="{ get numeros() { return jogo?.numeros.join(', ') } }"
+              x-text="numeros ? numeros : 'Aguardando...'"
+            ></em>
           </p>
           <p aria-live="assertive">
             Último número:
-            <em x-text="ultimoNumero"></em>
+            <em x-text="jogo?.numeros[0] ?? 'Aguardando...'"></em>
           </p>
           <table>
             <thead>
@@ -55,7 +58,7 @@
               </tr>
             </thead>
             <tbody>
-              <template x-for="l in cartela?.linhas">
+              <template x-for="l in cartela?.linhas ?? []">
                 <tr>
                   <template x-for="c in l">
                     <td

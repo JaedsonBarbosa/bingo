@@ -51,18 +51,6 @@ const admin = () => ({
     alert('Removido administrador.')
   },
 
-  get ultimosNumeros() {
-    const nums = this?.jogo?.numeros
-    if (!nums?.length) return 'Aguardando...'
-    return nums.slice().reverse().join(', ')
-  },
-
-  get ultimoNumero() {
-    const nums = this?.jogo?.numeros
-    if (!nums?.length) return 'Aguardando...'
-    return nums[nums.length - 1]
-  },
-
   async encerrarJogo(verificar = true) {
     const certeza = 'Tem certeza de que quer cancelar o jogo?'
     if (verificar && !confirm(certeza)) return
@@ -115,6 +103,7 @@ const admin = () => ({
       jogo.onSnapshot((j) => {
         const jogo = j.data() as IJogo
         this.jogo = jogo
+        this.jogo.numeros.reverse()
         const telOrganizador = this.jogo?.organizador.telefone
         const telUser = auth.currentUser!.phoneNumber
         const gerenciavel = telOrganizador == telUser

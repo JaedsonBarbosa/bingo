@@ -44,11 +44,14 @@
             </button>
             <p>
               Números chamados:
-              <em x-text="ultimosNumeros"></em>
+              <em
+                x-data="{ get numeros() { return jogo?.numeros.join(', ') } }"
+                x-text="numeros ? numeros : 'Aguardando...'"
+              ></em>
             </p>
-            <p>
+            <p aria-live="assertive">
               Último número:
-              <em x-text="ultimoNumero"></em>
+              <em x-text="jogo?.numeros[0] ?? 'Aguardando...'"></em>
             </p>
           </div>
           <div x-show="! jogoGerenciavel">

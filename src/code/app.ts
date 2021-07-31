@@ -36,6 +36,43 @@ function calcularLinhasCartela(
 }
 
 const webapp = () => ({
+  init() {
+    const user = auth.currentUser!
+    usuarios
+      .doc(user.uid)
+      .get()
+      .then((v) => (this.isAdmin = isAdmin(v.data() as IUsuario, user.uid)))
+    jogos
+      .orderBy('data', 'desc')
+      .limit(10)
+      .onSnapshot(
+        (v) => (this.jogos = v.docs.map((k) => k.data() as IJogoAntigo))
+      )
+    jogo.onSnapshot(async (j) => {
+      if (j.exists) {
+        this.jogo = j.data() as IJogo
+        this.jogo.numeros.reverse()
+        if (!this.cartela) {
+          const doc = await cartelas.doc(user!.uid).get()
+          if (!doc.exists) return
+          const { ganhou, numeros } = doc.data() as ICartela
+          const nums = numeros.sort((a, b) => a - b)
+          const linhas = calcularLinhasCartela(
+            nums.filter((v) => numsB.includes(v)),
+            nums.filter((v) => numsI.includes(v)),
+            nums.filter((v) => numsN.includes(v)),
+            nums.filter((v) => numsG.includes(v)),
+            nums.filter((v) => numsO.includes(v))
+          )
+          this.cartela = { ganhou, numeros, linhas }
+        }
+      } else {
+        this.jogo = undefined
+        this.cartela = undefined
+      }
+    })
+  },
+
   isAdmin: false,
 
   jogos: [] as IJogoAntigo[],
@@ -50,24 +87,6 @@ const webapp = () => ({
 
   jogo: undefined as IJogo | undefined,
   cartela: undefined as ICartelaExtendida | undefined,
-
-  get reversoNumeros() {
-    const nums = this?.jogo?.numeros
-    if (!nums?.length) return []
-    return nums.slice().reverse()
-  },
-
-  get ultimosNumeros() {
-    const nums = this?.jogo?.numeros
-    if (!nums?.length) return 'Aguardando...'
-    return nums.slice().reverse().join(', ')
-  },
-
-  get ultimoNumero() {
-    const nums = this?.jogo?.numeros
-    if (!nums?.length) return 'Aguardando...'
-    return nums[nums.length - 1]
-  },
 
   async bingo() {
     if (!this.cartela || !this.jogo) return
@@ -107,43 +126,7 @@ const webapp = () => ({
     await cartelas.doc(auth.currentUser!.uid).set(cartela)
     const linhas = calcularLinhasCartela(b, i, n, g, o)
     this.cartela = { ganhou, numeros, linhas }
-  },
-
-  init() {
-    const user = auth.currentUser!
-    usuarios
-      .doc(user.uid)
-      .get()
-      .then((v) => (this.isAdmin = isAdmin(v.data() as IUsuario, user.uid)))
-    jogos
-      .orderBy('data', 'desc')
-      .limit(10)
-      .onSnapshot(
-        (v) => (this.jogos = v.docs.map((k) => k.data() as IJogoAntigo))
-      )
-    jogo.onSnapshot(async (j) => {
-      if (j.exists) {
-        this.jogo = j.data() as IJogo
-        if (!this.cartela) {
-          const doc = await cartelas.doc(user!.uid).get()
-          if (!doc.exists) return
-          const { ganhou, numeros } = doc.data() as ICartela
-          const nums = numeros.sort((a, b) => a - b)
-          const linhas = calcularLinhasCartela(
-            nums.filter((v) => numsB.includes(v)),
-            nums.filter((v) => numsI.includes(v)),
-            nums.filter((v) => numsN.includes(v)),
-            nums.filter((v) => numsG.includes(v)),
-            nums.filter((v) => numsO.includes(v))
-          )
-          this.cartela = { ganhou, numeros, linhas }
-        }
-      } else {
-        this.jogo = undefined
-        this.cartela = undefined
-      }
-    })
-  },
+  }
 })
 
 const encerrar = auth.onAuthStateChanged((user) => {
