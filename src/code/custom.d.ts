@@ -33,9 +33,5 @@ interface ICartela {
 }
 
 interface ICartelaExtendida extends ICartela {
-  b: number[]
-  i: number[]
-  n: number[]
-  g: number[]
-  o: number[]
+  linhas: number[][]
 }

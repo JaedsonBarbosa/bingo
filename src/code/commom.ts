@@ -34,6 +34,14 @@ export function isAdmin(data: IUsuario, id: string) {
   return data.admin || id === 'hhSt3z6SqfXqUqFoiEM5W6hfy0Kf'
 }
 
+export function openLogin() {
+  window.location.replace('./login.html')
+}
+
+export function openApp() {
+  window.location.replace('./app.html')
+}
+
 export function misturar(array: number[]) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * i)

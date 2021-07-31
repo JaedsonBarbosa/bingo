@@ -25,6 +25,9 @@
       <button class="button-outline" @click="encerrarSessao">
         Encerrar sessão
       </button>
+      <a class="button button-outline" href="login.html">
+        Alterar dados cadastrais
+      </a>
       <a x-show="isAdmin" class="button button-outline" href="adm.html">
         Acessar painel administrativo
       </a>
@@ -52,7 +55,7 @@
               </tr>
             </thead>
             <tbody>
-              <template x-for="l in linhasCartela">
+              <template x-for="l in cartela?.linhas">
                 <tr>
                   <template x-for="c in l">
                     <td

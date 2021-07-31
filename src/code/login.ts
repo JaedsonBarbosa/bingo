@@ -1,11 +1,6 @@
-import { auth, isAdmin, PhoneProvider, usuarios } from './commom'
+import { auth, isAdmin, PhoneProvider, usuarios, openApp } from './commom'
 import * as firebaseui from "firebaseui"
 import Alpine from 'alpinejs'
-
-const params = new URLSearchParams(window.location.search)
-const adminRequest = params.has('admin')
-
-const webapp = './app.html'
 
 Alpine.data('login', () => ({
   exibir: false,
@@ -45,19 +40,14 @@ Alpine.data('login', () => ({
         this.exibir = true
         return
       }
-      const data = doc.data() as IUsuario
       if (this.iniciadoLogado) {
+        const data = doc.data() as IUsuario
         this.telefone = v.phoneNumber!
         this.nome = data.nome
         this.estado = data.estado
         this.municipio = data.municipio
         this.exibir = true
-      } else if (isAdmin(data, v.uid)) {
-        window.location.replace(adminRequest ? './adm.html' : webapp)
-      } else {
-        if (adminRequest) alert('Você não é um administrador.')
-        window.location.replace(webapp)
-      }
+      } else openApp()
     })
   },
 
@@ -71,7 +61,7 @@ Alpine.data('login', () => ({
       },
       { merge: true }
     )
-    window.location.replace(webapp)
+    openApp()
   },
 }))
 
