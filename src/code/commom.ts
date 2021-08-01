@@ -25,28 +25,10 @@ export const jogo = db.collection('geral').doc('jogo')
 export const cartelas = jogo.collection('cartelas')
 export const jogos = db.collection('jogos')
 
-export async function carregarJogos() {
-  const res = await jogos.orderBy('data', 'desc').limit(10).get()
-  return res.docs.map((v) => v.data())
-}
-
-export function isAdmin(data: IUsuario, id: string) {
-  return data.admin || id === 'hhSt3z6SqfXqUqFoiEM5W6hfy0Kf'
-}
-
 export function openLogin() {
   window.location.replace('./login.html')
 }
 
 export function openApp() {
   window.location.replace('./app.html')
-}
-
-export function misturar(array: number[]) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * i)
-    const temp = array[i]
-    array[i] = array[j]
-    array[j] = temp
-  }
 }

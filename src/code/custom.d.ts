@@ -13,7 +13,7 @@ interface IUsuario {
 }
 
 interface IUsuarioExtendido extends IUsuario {
-  id: string
+  inverterAdmin: () => Promise<void>
 }
 
 interface IJogo {
@@ -22,7 +22,7 @@ interface IJogo {
   organizador: IUsuario
 }
 
-interface IJogoAntigo extends IJogo {
+interface IJogos extends IJogo {
   data: firebase.default.firestore.Timestamp
   ganhador: IUsuario & { id: string }
 }

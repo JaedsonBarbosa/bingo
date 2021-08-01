@@ -33,30 +33,26 @@
       <hr />
       <details>
         <summary class="button">Jogos</summary>
-        <h5>Gerenciamento de jogos</h5>
-        <div x-show="jogo">
-          <div x-show="jogoGerenciavel">
-            <button class="button-outline" @click="encerrarJogo">
-              Cancelar jogo
-            </button>
-            <button class="button-outline" @click="chamarNumero">
-              Chamar número
-            </button>
-            <p>
-              Números chamados:
-              <em
-                x-data="{ get numeros() { return jogo?.numeros.join(', ') } }"
-                x-text="numeros ? numeros : 'Aguardando...'"
-              ></em>
-            </p>
-            <p aria-live="assertive">
-              Último número:
-              <em x-text="jogo?.numeros[0] ?? 'Aguardando...'"></em>
-            </p>
-          </div>
-          <div x-show="! jogoGerenciavel">
-            <p>Um jogo está em execução neste momento.</p>
-          </div>
+        <div x-show="jogo?.organizador.telefone == telefone">
+          <h5>Gerenciamento de jogos</h5>
+          <button class="button-outline" @click="encerrarJogo">
+            Cancelar jogo
+          </button>
+          <button class="button-outline" @click="chamarNumero">
+            Chamar número
+          </button>
+          <p>
+            Números chamados:
+            <em
+              x-data="{ get numeros() { return jogo?.numeros.join(', ') } }"
+              x-text="numeros ? numeros : 'Aguardando...'"
+            ></em>
+          </p>
+          <p aria-live="assertive">
+            Último número:
+            <em x-text="jogo?.numeros[0] ?? 'Aguardando...'"></em>
+          </p>
+          <p>Quantidade de números chamados: <em x-text="jogo?.numeros.length ?? 0"></em></p>
         </div>
         <div x-show="! jogo">
           <button class="button-outline" @click="novoJogo">Criar jogo</button>
@@ -95,7 +91,7 @@
               Município
               <span x-text="a.municipio"></span>
             </p>
-            <button class="button-outline" @click="removerAdministrador(a.id)">
+            <button class="button-outline" @click="a.inverterAdmin()">
               Remover
             </button>
           </details>
@@ -105,7 +101,7 @@
       <details>
         <summary class="button">Usuários comuns</summary>
         <h5>Consulta de usuários</h5>
-        <template x-for="u in usuarios">
+        <template x-for="a in usuarios">
           <details>
             <summary x-text="a.nome"></summary>
             <p>
@@ -118,6 +114,9 @@
               Município
               <span x-text="a.municipio"></span>
             </p>
+            <button class="button-outline" @click="a.inverterAdmin()">
+              Torná-lo administrador
+            </button>
           </details>
         </template>
       </details>

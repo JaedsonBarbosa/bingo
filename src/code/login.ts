@@ -1,5 +1,5 @@
-import { auth, isAdmin, PhoneProvider, usuarios, openApp } from './commom'
-import * as firebaseui from "firebaseui"
+import { auth, PhoneProvider, usuarios, openApp } from './commom'
+import * as firebaseui from 'firebaseui'
 import Alpine from 'alpinejs'
 
 Alpine.data('login', () => ({
@@ -14,33 +14,18 @@ Alpine.data('login', () => ({
     auth.onAuthStateChanged(async (v) => {
       if (!v) {
         this.iniciadoLogado = false
-        const idContainer = '#loginDialog'
-        const loginDialog = document.querySelector(idContainer)
+        const loginDialog = document.querySelector('#loginDialog')
         if (!loginDialog) return
         const ui = new firebaseui.auth.AuthUI(auth)
-        const params: any = {
-          callbacks: {
-            signInSuccessWithAuthResult: () => {
-              loginDialog.remove()
-              return false
-            },
-          },
-          signInOptions: [
-            {
-              provider: PhoneProvider,
-              defaultCountry: 'BR',
-            },
-          ],
-        }
-        ui.start(idContainer, params)
+        const provider = { provider: PhoneProvider, defaultCountry: 'BR' }
+        const callbacks = { signInSuccessWithAuthResult: () => false }
+        ui.start(loginDialog, { callbacks, signInOptions: [provider] })
         return
       }
       const doc = await usuarios.doc(v.uid).get()
       if (!doc.exists) {
         this.exibir = true
-        return
-      }
-      if (this.iniciadoLogado) {
+      } else if (this.iniciadoLogado) {
         const data = doc.data() as IUsuario
         this.telefone = v.phoneNumber!
         this.nome = data.nome
@@ -51,17 +36,10 @@ Alpine.data('login', () => ({
     })
   },
 
-  async atualizar() {
-    await usuarios.doc(auth.currentUser!.uid).set(
-      {
-        telefone: this.telefone,
-        nome: this.nome,
-        estado: this.estado,
-        municipio: this.municipio,
-      },
-      { merge: true }
-    )
-    openApp()
+  atualizar() {
+    const { telefone, nome, estado, municipio } = this
+    const data: IUsuario = { telefone, nome, estado, municipio }
+    usuarios.doc(auth.currentUser!.uid).set(data, { merge: true }).then(openApp)
   },
 }))
 
