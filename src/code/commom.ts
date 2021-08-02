@@ -12,8 +12,11 @@ var firebaseConfig = {
   messagingSenderId: '920310842656',
 }
 firebase.initializeApp(firebaseConfig)
-firebase.firestore().useEmulator('localhost', 8080)
-firebase.auth().useEmulator('http://localhost:9099')
+
+if (process.env.NODE_ENV === 'development') {
+  firebase.firestore().useEmulator('localhost', 8080)
+  firebase.auth().useEmulator('http://localhost:9099')
+}
 
 export const PhoneProvider = firebase.auth.PhoneAuthProvider.PROVIDER_ID
 export const FieldValue = firebase.firestore.FieldValue

@@ -4,4 +4,5 @@ node_modules/
 web-build/
 *.log
 .parcel-cache
+.firebase
 public

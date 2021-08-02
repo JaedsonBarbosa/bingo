@@ -17,13 +17,22 @@ Alpine.data('login', () => ({
         const loginDialog = document.querySelector('#loginDialog')
         if (!loginDialog) return
         const ui = new firebaseui.auth.AuthUI(auth)
-        const provider = { provider: PhoneProvider, defaultCountry: 'BR' }
+        const provider = {
+          provider: PhoneProvider,
+          defaultCountry: 'BR',
+          recaptchaParameters: {
+            type: 'audio',
+            size: 'invisible',
+            badge: 'bottomright'
+          },
+        }
         const callbacks = { signInSuccessWithAuthResult: () => false }
         ui.start(loginDialog, { callbacks, signInOptions: [provider] })
         return
       }
       const doc = await usuarios.doc(v.uid).get()
       if (!doc.exists) {
+        this.telefone = v.phoneNumber!
         this.exibir = true
       } else if (this.iniciadoLogado) {
         const data = doc.data() as IUsuario

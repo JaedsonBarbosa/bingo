@@ -12,7 +12,7 @@ const webapp = () => ({
 
   init() {
     const user = auth.currentUser!
-    if (user.uid === 'hhSt3z6SqfXqUqFoiEM5W6hfy0Kf') this.isAdmin = true
+    if (user.uid === 'KumQccTn3CgKp24PqIJLCb9Rwq42') this.isAdmin = true
     else {
       usuarios
         .doc(user.uid)

@@ -4,7 +4,10 @@
     "start": "run-p start:*",
     "start:parcel": "parcel watch src/index.html --dist-dir public",
     "start:firebase": "firebase emulators:start --import .save-data --export-on-exit",
-    "publish": "firebase deploy"
+    "publish": "run-s publish:*",
+    "publish:clean": "rmdir /s /q public",
+    "publish:build": "parcel build src/index.html --dist-dir public --no-source-maps",
+    "publish:firebase": "firebase deploy"
   },
   "devDependencies": {
     "@parcel/transformer-sass": "^2.0.0-beta.3.1",
