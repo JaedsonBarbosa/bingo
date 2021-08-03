@@ -1,0 +1,33 @@
+<header>
+  <div class="container">
+    <div class="row">
+      <div class="column">
+        <img
+          src="assets/logo.jpg"
+          title="Uma cartela de bingo, com o símbolo de acessibilidade no centro."
+        />
+        <h1>
+          Voice
+          <br />
+          Bingo
+        </h1>
+      </div>
+      <div class="column">
+        <details>
+          <summary class="button">
+            Logado:
+            <span x-text="telefone"></span>
+          </summary>
+          <br />
+          <button class="button-outline" @click="encerrarSessao">
+            Encerrar sessão
+          </button>
+          <a class="button button-outline" href="login.html">Alterar dados</a>
+          <if condition="admin">
+            <a class="button button-outline" href="app.html">Sair do painel</a>
+          </if>
+        </details>
+      </div>
+    </div>
+  </div>
+</header>

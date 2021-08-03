@@ -11,41 +11,7 @@
     <script type="module" src="code/adm.ts"></script>
   </head>
   <body x-data="admin">
-    <header>
-      <div class="container">
-        <div class="row">
-          <div class="column">
-            <img
-              src="assets/logo.jpg"
-              title="Uma cartela de bingo, com o símbolo de acessibilidade no centro."
-            />
-            <h1>
-              Voice
-              <br />
-              Bingo
-            </h1>
-          </div>
-          <div class="column">
-            <details>
-              <summary class="button">
-                Logado:
-                <span x-text="telefone"></span>
-              </summary>
-              <br />
-              <button class="button-outline" @click="encerrarSessao">
-                Encerrar sessão
-              </button>
-              <a class="button button-outline" href="login.html">
-                Alterar dados
-              </a>
-              <a class="button button-outline" href="app.html">
-                Sair do painel
-              </a>
-            </details>
-          </div>
-        </div>
-      </div>
-    </header>
+    <include src="modules/header.html" locals='{"admin": true}'></include>
     <main class="container" x-cloak>
       <div x-show="tela == 'inicio'">
         <h3>Jogos</h3>
@@ -87,19 +53,7 @@
           <em x-text="jogo?.numeros.length ?? 0"></em>
         </p>
       </div>
-      <div x-show="tela == 'jogos'">
-        <h3>Jogos</h3>
-        <a href="#inicio" class="button">Voltar</a>
-        <template x-for="j in jogos">
-          <details>
-            <summary x-text="j.titulo"></summary>
-            <p>
-              Ganhador:
-              <span x-text="j.ganhador.nome"></span>
-            </p>
-          </details>
-        </template>
-      </div>
+      <include src="modules/jogos.html"></include>
       <template x-if="tela == 'addAdmin'">
         <div
           x-data="{ tel: '', get comuns() { return usuarios.filter(v => !v.admin) } }"
@@ -116,24 +70,24 @@
             </template>
           </datalist>
           <template
-            x-data="{ get res() { return comuns.find(v => v.telefone == tel) } }"
-            x-if="res"
+            x-data="{ get u() { return comuns.find(v => v.telefone == tel) } }"
+            x-if="u"
           >
             <div>
               <p>
                 Telefone:
-                <span x-text="res?.telefone"></span>
+                <span x-text="u?.telefone"></span>
                 <br />
                 Nome:
-                <span x-text="res?.nome"></span>
+                <span x-text="u?.nome"></span>
                 <br />
                 Estado:
-                <span x-text="res?.estado"></span>
+                <span x-text="u?.estado"></span>
                 <br />
                 Município
-                <span x-text="res?.municipio"></span>
+                <span x-text="u?.municipio"></span>
               </p>
-              <button @click="res?.inverterAdmin">Promover</button>
+              <button @click="u?.inverterAdmin">Promover</button>
             </div>
           </template>
         </div>
@@ -147,20 +101,21 @@
         <a href="#inicio" class="button">Voltar</a>
         <template
           x-data="{ get filtrados() { return usuarios.filter(v => v.admin == admins) } }"
-          x-for="a in filtrados"
+          x-for="u in filtrados"
         >
           <details>
-            <summary x-text="a.nome"></summary>
+            <summary x-text="u.nome"></summary>
             <p>
               Telefone:
-              <span x-text="a.telefone"></span>
+              <span x-text="u.telefone"></span>
               <br />
               Estado:
-              <span x-text="a.estado"></span>
+              <span x-text="u.estado"></span>
               <br />
               Município
-              <span x-text="a.municipio"></span>
+              <span x-text="u.municipio"></span>
             </p>
+            <button @click="u.inverterAdmin">Remover</button>
           </details>
         </template>
       </div>

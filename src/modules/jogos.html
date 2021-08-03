@@ -1,0 +1,13 @@
+<div x-show="tela == 'jogos'">
+  <h3>Jogos</h3>
+  <a href="#inicio" class="button">Voltar</a>
+  <template x-for="j in jogos">
+    <details>
+      <summary x-text="j.titulo"></summary>
+      <p>
+        Ganhador:
+        <span x-text="j.ganhador.nome"></span>
+      </p>
+    </details>
+  </template>
+</div>

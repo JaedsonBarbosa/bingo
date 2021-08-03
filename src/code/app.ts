@@ -21,7 +21,7 @@ const webapp = () => ({
     }
     jogos
       .orderBy('data', 'desc')
-      .limit(10)
+      .limit(20)
       .onSnapshot((v) => (this.jogos = v.docs.map((k) => k.data() as IJogos)))
     jogo.onSnapshot(async (j) => {
       if (j.exists) {
