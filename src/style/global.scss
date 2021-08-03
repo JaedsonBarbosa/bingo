@@ -32,7 +32,11 @@ header {
   cursor: pointer;
 }
 
-// template { display: none; }
+dialog {
+  form {
+    margin-bottom: 0;
+  }
+}
 
 .firebase-emulator-warning {
   display: none;

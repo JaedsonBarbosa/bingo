@@ -1,6 +1,35 @@
 <div x-show="tela == 'jogos'">
   <h3>Jogos</h3>
   <button @click="abrir('inicio')">Voltar</button>
+  <button @click="$refs.filtrar.showModal()">Filtrar</button>
+  <dialog x-ref="filtrar">
+    <form method="dialog" @submit="carregarJogos">
+      <label>
+        Exibir até
+        <input type="date" x-model="filtroJogos.ateData">
+      </label>
+      <label>
+        Estado organizador
+        <select x-model="filtroJogos.ufOrganizador">
+          <option></option>
+          <template x-for="e in ufs">
+            <option x-text="e.Nome"></option>
+          </template>
+        </select>
+      </label>
+      <label>
+        Estado ganhador
+        <select x-model="filtroJogos.ufGanhador">
+          <option></option>
+          <template x-for="e in ufs">
+            <option x-text="e.Nome"></option>
+          </template>
+        </select>
+      </label>
+      <button type="button" @click="$refs.filtrar.close()">Cancelar</button>
+      <input type="submit">
+    </form>
+  </dialog>
   <template x-for="j in jogos">
     <details>
       <summary x-text="j.titulo + ' - ' + j.data.toDate().toLocaleString()"></summary>

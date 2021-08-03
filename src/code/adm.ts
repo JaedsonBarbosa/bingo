@@ -10,6 +10,7 @@ import {
   openApp,
 } from './commom'
 import Alpine from 'alpinejs'
+import IBGE from './IBGE'
 
 const admin = () => ({
   tela: '',
@@ -24,6 +25,27 @@ const admin = () => ({
     window.open('#' + tela, '_self')
   },
 
+  ufs: IBGE,
+
+  filtroJogos: {
+    ufOrganizador: '',
+    ufGanhador: '',
+    ateData: ''
+  },
+
+  carregarJogos() {
+    let query = jogos.orderBy('data', 'desc').limit(20)
+    const ufOrg = this.filtroJogos.ufOrganizador
+    if (ufOrg) query = query.where('organizador.estado', '==', ufOrg)
+    const ufGan = this.filtroJogos.ufGanhador
+    if (ufGan) query = query.where('ganhador.estado', '==', ufGan)
+    const ateData = this.filtroJogos.ateData
+    if (ateData) query = query.where('data', '<=', new Date(ateData))
+    query
+      .get()
+      .then((v) => (this.jogos = v.docs.map((k) => k.data() as IJogos)))
+  },
+
   init() {
     const updateTela = () => {
       const hash = window.location.hash.substr(1)
@@ -31,10 +53,7 @@ const admin = () => ({
     }
     window.onhashchange = updateTela
     updateTela()
-    jogos
-      .orderBy('data', 'desc')
-      .limit(20)
-      .onSnapshot((v) => (this.jogos = v.docs.map((k) => k.data() as IJogos)))
+    this.carregarJogos()
     usuarios.onSnapshot((v) => {
       this.usuarios = v.docs.map((v) => ({
         ...(v.data() as IUsuario),
