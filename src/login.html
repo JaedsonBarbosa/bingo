@@ -40,11 +40,21 @@
         </label>
         <label>
           Estado
-          <input x-model="estado" minlength="2" required />
+          <select x-model="estado" required>
+            <template x-for="e in ufs">
+              <option x-text="e.Nome"></option>
+            </template>
+          </select>
         </label>
         <label>
           Município
-          <input x-model="municipio" minlength="2" required />
+          <select x-model="municipio" required>
+            <template
+              x-for="e in ufs.find(v => v.Nome == estado)?.Municipios ?? []"
+            >
+              <option x-text="e"></option>
+            </template>
+          </select>
         </label>
         <input type="submit" />
       </form>

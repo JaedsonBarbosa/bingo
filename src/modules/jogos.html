@@ -1,12 +1,32 @@
 <div x-show="tela == 'jogos'">
   <h3>Jogos</h3>
-  <a href="#inicio" class="button">Voltar</a>
+  <button @click="abrir('inicio')">Voltar</button>
   <template x-for="j in jogos">
     <details>
-      <summary x-text="j.titulo"></summary>
+      <summary x-text="j.titulo + ' - ' + j.data.toDate().toLocaleString()"></summary>
       <p>
-        Ganhador:
+        <strong>Ganhador:</strong>
+        <br />
         <span x-text="j.ganhador.nome"></span>
+        <br />
+        <span x-text="j.ganhador.telefone"></span>
+        <br />
+        <span
+          x-data="{ text: j.ganhador.municipio + '/' + j.ganhador.estado }"
+          x-text="text"
+        ></span>
+      </p>
+      <p>
+        <strong>Organizador:</strong>
+        <br />
+        <span x-text="j.organizador.nome"></span>
+        <br />
+        <span x-text="j.organizador.telefone"></span>
+        <br />
+        <span
+          x-data="{ text: j.organizador.municipio + '/' + j.organizador.estado }"
+          x-text="text"
+        ></span>
       </p>
     </details>
   </template>

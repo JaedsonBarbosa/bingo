@@ -28,9 +28,11 @@ header {
   }
 }
 
-template {
-  display: none;
+.clicavel {
+  cursor: pointer;
 }
+
+// template { display: none; }
 
 .firebase-emulator-warning {
   display: none;

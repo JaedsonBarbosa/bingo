@@ -1,11 +1,9 @@
 import { auth, firebase, usuarios, openApp, openAdmin } from './commom'
 import Alpine from 'alpinejs'
-
-export const PhoneProvider = firebase.auth.PhoneAuthProvider.PROVIDER_ID
+import IBGE from './IBGE'
 
 const captchaParams = { size: 'invisible' }
 const captcha = new firebase.auth.RecaptchaVerifier('avancar', captchaParams)
-
 const toAdmin = new URLSearchParams(window.location.search).has('admin')
 
 function openNext() {
@@ -22,12 +20,11 @@ Alpine.data('login', () => ({
   iniciadoLogado: true,
   pedirTelefone: false,
   pedirCodigo: false,
-
+  ufs: IBGE,
   confirmationResult: undefined as firebase.auth.ConfirmationResult | undefined,
 
   init() {
     auth.onAuthStateChanged(async (v) => {
-      console.log(v)
       if (!v) {
         this.iniciadoLogado = false
         this.pedirTelefone = true
