@@ -15,3 +15,5 @@ Não esquecer de executar o comando `npm install` dentro da pasta demo antes de 
 * Para publicar o projeto no Expo basta rodar dentro da pasta demo `npm run publish`.
 * Para atualizar a versão Web hospedada no Firebase Hosting, basta executar o comando `npm run build` dentro da pasta demo e, depois, fora da pasta demo, executar `firebase deploy --only hosting`.
 * Para atualizar as regras do Firestore usar o comando `firebase deploy --only firestore`.
+
+{"apiKey":"AIzaSyDhxqDJPSacpKe_gx1n4BppD17L4qUR8lo","authDomain":"voicebingo.firebaseapp.com","projectId":"voicebingo","storageBucket":"voicebingo.appspot.com","messagingSenderId":"574006113930","appId":"1:574006113930:web:f7ef107158ce38e46f1f73"}

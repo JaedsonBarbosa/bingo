@@ -4,8 +4,31 @@
 
 [x-cloak] { display: none !important; }
 
-h3 {
-  margin-top: 4rem;
+header {
+  background: aliceblue;
+  padding-top: 2rem;
+
+  img {
+    margin-right: 1rem;
+    display: inline-block;
+    height: 11.04rem;
+    border-radius: 1rem;
+    vertical-align: top;
+  }
+
+  h1 {
+    display: inline-block;
+  }
+
+  details {
+    @media (min-width: 40.0rem) {
+      text-align: right;
+    }
+  }
+}
+
+main > div {
+  margin-top: 3rem;
 }
 
 template {

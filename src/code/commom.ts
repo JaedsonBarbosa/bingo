@@ -2,16 +2,7 @@ import firebase from 'firebase/app'
 import 'firebase/auth'
 import 'firebase/firestore'
 
-var firebaseConfig = {
-  projectId: 'bingo-facil-33',
-  appId: '1:920310842656:web:b84d52d7669494509ac345',
-  storageBucket: 'bingo-facil-33.appspot.com',
-  locationId: 'southamerica-east1',
-  apiKey: 'AIzaSyCi6Yr8TLH0DOfrUWtK9D7PL2C3CITzQRk',
-  authDomain: 'bingo-facil-33.firebaseapp.com',
-  messagingSenderId: '920310842656',
-}
-firebase.initializeApp(firebaseConfig)
+firebase.initializeApp(JSON.parse(process.env.firebaseConfig as string))
 
 if (process.env.NODE_ENV === 'development') {
   firebase.firestore().useEmulator('localhost', 8080)

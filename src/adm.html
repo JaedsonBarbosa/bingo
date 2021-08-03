@@ -4,81 +4,151 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/png" href="assets/logo.png" />
+    <link rel="icon" type="image/png" href="assets/logo.jpg" />
     <title>Administração</title>
 
     <link rel="stylesheet" href="style/global.scss" />
     <script type="module" src="code/adm.ts"></script>
   </head>
-  <body>
-    <header class="container">
-      <h3>Administração</h3>
-    </header>
-    <main class="container" x-data="admin" x-cloak>
-      <p>
-        Logado no momento com o número
-        <span x-text="telefone"></span>
-        .
-      </p>
-      <button class="button-outline" @click="encerrarSessao">
-        Encerrar sessão
-      </button>
-      <a class="button button-outline" href="login.html">
-        Alterar dados cadastrais
-      </a>
-      <a class="button button-outline" href="app.html">
-        Sair do painel administrativo
-      </a>
-
-      <hr />
-      <details>
-        <summary class="button">Jogos</summary>
-        <div x-show="jogo?.organizador.telefone == telefone">
-          <h5>Gerenciamento de jogos</h5>
-          <button class="button-outline" @click="encerrarJogo">
-            Cancelar jogo
-          </button>
-          <button class="button-outline" @click="chamarNumero">
-            Chamar número
-          </button>
-          <p>
-            Números chamados:
-            <em
-              x-data="{ get numeros() { return jogo?.numeros.join(', ') } }"
-              x-text="numeros ? numeros : 'Aguardando...'"
-            ></em>
-          </p>
-          <p aria-live="assertive">
-            Último número:
-            <em x-text="jogo?.numeros[0] ?? 'Aguardando...'"></em>
-          </p>
-          <p>Quantidade de números chamados: <em x-text="jogo?.numeros.length ?? 0"></em></p>
-        </div>
-        <div x-show="! jogo">
-          <button class="button-outline" @click="novoJogo">Criar jogo</button>
-        </div>
-        <div x-show="jogos.length">
-          <h5>Histórico de jogos</h5>
-          <template x-for="j in jogos">
+  <body x-data="admin">
+    <header>
+      <div class="container">
+        <div class="row">
+          <div class="column">
+            <img
+              src="assets/logo.jpg"
+              title="Uma cartela de bingo, com o símbolo de acessibilidade no centro."
+            />
+            <h1>
+              Voice
+              <br />
+              Bingo
+            </h1>
+          </div>
+          <div class="column">
             <details>
-              <summary x-text="j.titulo"></summary>
-              <p>
-                Ganhador:
-                <span x-text="j.ganhador.nome"></span>
-              </p>
+              <summary class="button">
+                Logado:
+                <span x-text="telefone"></span>
+              </summary>
+              <br />
+              <button class="button-outline" @click="encerrarSessao">
+                Encerrar sessão
+              </button>
+              <a class="button button-outline" href="login.html">
+                Alterar dados
+              </a>
+              <a class="button button-outline" href="app.html">
+                Sair do painel
+              </a>
             </details>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main class="container" x-cloak>
+      <div x-show="tela == 'inicio'">
+        <h3>Jogos</h3>
+        <a
+          class="button"
+          x-show="jogo?.organizador.telefone == telefone"
+          href="#jogo"
+        >
+          Gerenciar
+        </a>
+        <button x-show="! jogo" @click="novoJogo">Abrir</button>
+        <a class="button" x-show="jogos.length" href="#jogos">Consultar</a>
+        <hr />
+        <h3>Administradores</h3>
+        <a class="button" href="#addAdmin">Adicionar</a>
+        <a class="button" href="#admins">Consultar</a>
+        <hr />
+        <h3>Usuários</h3>
+        <a class="button" href="#usuarios">Consultar</a>
+      </div>
+      <div x-show="tela == 'jogo'">
+        <h3>Gerenciamento de jogos</h3>
+        <a href="#inicio" class="button">Voltar</a>
+        <button @click="encerrarJogo">Cancelar jogo</button>
+        <button @click="chamarNumero">Chamar número</button>
+        <p>
+          Números chamados:
+          <em
+            x-data="{ get numeros() { return jogo?.numeros.join(', ') } }"
+            x-text="numeros ? numeros : 'Aguardando...'"
+          ></em>
+        </p>
+        <p aria-live="assertive">
+          Último número:
+          <em x-text="jogo?.numeros[0] ?? 'Aguardando...'"></em>
+        </p>
+        <p>
+          Quantidade de números chamados:
+          <em x-text="jogo?.numeros.length ?? 0"></em>
+        </p>
+      </div>
+      <div x-show="tela == 'jogos'">
+        <h3>Jogos</h3>
+        <a href="#inicio" class="button">Voltar</a>
+        <template x-for="j in jogos">
+          <details>
+            <summary x-text="j.titulo"></summary>
+            <p>
+              Ganhador:
+              <span x-text="j.ganhador.nome"></span>
+            </p>
+          </details>
+        </template>
+      </div>
+      <template x-if="tela == 'addAdmin'">
+        <div
+          x-data="{ tel: '', get comuns() { return usuarios.filter(v => !v.admin) } }"
+        >
+          <h3>Adicionar administrador</h3>
+          <a href="#inicio" class="button">Voltar</a>
+          <label>
+            Telefone
+            <input x-model="tel" list="usuarios" />
+          </label>
+          <datalist id="usuarios">
+            <template x-for="a in comuns">
+              <option x-text="a.telefone"></option>
+            </template>
+          </datalist>
+          <template
+            x-data="{ get res() { return comuns.find(v => v.telefone == tel) } }"
+            x-if="res"
+          >
+            <div>
+              <p>
+                Telefone:
+                <span x-text="res?.telefone"></span>
+                <br />
+                Nome:
+                <span x-text="res?.nome"></span>
+                <br />
+                Estado:
+                <span x-text="res?.estado"></span>
+                <br />
+                Município
+                <span x-text="res?.municipio"></span>
+              </p>
+              <button @click="res?.inverterAdmin">Promover</button>
+            </div>
           </template>
         </div>
-      </details>
-      <hr />
-      <details>
-        <summary class="button">Administradores</summary>
-        <h5>Gerenciamento</h5>
-        <button class="button-outline" @click="adicionarAdministrador">
-          Adicionar
-        </button>
-        <h5>Consulta de administradores</h5>
-        <template x-for="a in administradores">
+      </template>
+      <div
+        x-data="{ get admins() { return tela == 'admins' } }"
+        x-show="admins || tela == 'usuarios'"
+      >
+        <h3 x-show="admins">Administradores</h3>
+        <h3 x-show="! admins">Usuários</h3>
+        <a href="#inicio" class="button">Voltar</a>
+        <template
+          x-data="{ get filtrados() { return usuarios.filter(v => v.admin == admins) } }"
+          x-for="a in filtrados"
+        >
           <details>
             <summary x-text="a.nome"></summary>
             <p>
@@ -91,35 +161,9 @@
               Município
               <span x-text="a.municipio"></span>
             </p>
-            <button class="button-outline" @click="a.inverterAdmin()">
-              Remover
-            </button>
           </details>
         </template>
-      </details>
-      <hr />
-      <details>
-        <summary class="button">Usuários comuns</summary>
-        <h5>Consulta de usuários</h5>
-        <template x-for="a in usuarios">
-          <details>
-            <summary x-text="a.nome"></summary>
-            <p>
-              Telefone:
-              <span x-text="a.telefone"></span>
-              <br />
-              Estado:
-              <span x-text="a.estado"></span>
-              <br />
-              Município
-              <span x-text="a.municipio"></span>
-            </p>
-            <button class="button-outline" @click="a.inverterAdmin()">
-              Torná-lo administrador
-            </button>
-          </details>
-        </template>
-      </details>
+      </div>
     </main>
   </body>
 </html>
