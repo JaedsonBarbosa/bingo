@@ -15,9 +15,14 @@ const admin = () => ({
   tela: '',
   jogos: [] as IJogos[],
   encerrarSessao: () => auth.signOut(),
+  alterarDados: () => openLogin(true),
   telefone: auth.currentUser!.phoneNumber,
   jogo: undefined as IJogo | undefined,
   usuarios: [] as IUsuarioExtendido[],
+
+  abrir(tela: string) {
+    window.open('#' + tela, '_self')
+  },
 
   init() {
     const updateTela = () => {
@@ -35,7 +40,7 @@ const admin = () => ({
         ...(v.data() as IUsuario),
         inverterAdmin: async () => {
           await v.ref.update({ admin: !v.get('admin') })
-          window.open('#inicio', '_self')
+          this.abrir('inicio')
         },
       }))
     }, openApp)
@@ -52,26 +57,25 @@ const admin = () => ({
         ganhador: { id, ...userDB.data() },
         data: FieldValue.serverTimestamp(),
       } as IJogos)
-      await this.encerrarJogo(true)
+      await this.encerrarJogo(false)
     })
   },
 
-  async encerrarJogo(confirma = confirm('Tem certeza disso?')) {
-    if (!confirma) return
+  async encerrarJogo(pedirConfirmacao = true) {
+    if (pedirConfirmacao && !confirm('Tem certeza disso?')) return
     const lote = db.batch()
     const registros = await cartelas.get()
     registros.docs.forEach((v) => lote.delete(v.ref))
     lote.delete(jogo)
     await lote.commit()
+    this.abrir('inicio')
   },
 
-  async novoJogo() {
-    const titulo = prompt('Titulo do jogo:')
-    if (!titulo) return
+  async novoJogo(titulo: string) {
     const userDB = await usuarios.doc(auth.currentUser!.uid).get()
     const organizador = userDB.data() as IUsuario
     await jogo.set({ titulo, numeros: [], organizador } as IJogo)
-    window.open('#jogo', '_self')
+    this.abrir('jogo')
   },
 
   async chamarNumero() {
@@ -88,7 +92,7 @@ let iniciado = false
 const encerrar = auth.onAuthStateChanged(async (user) => {
   if (!user) {
     encerrar()
-    openLogin()
+    openLogin(true)
     return
   } else if (!iniciado) {
     Alpine.data('admin', admin)

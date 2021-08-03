@@ -11,7 +11,7 @@
     <script type="module" src="code/adm.ts"></script>
   </head>
   <body x-data="admin">
-    <include src="modules/header.html" locals='{"admin": true}'></include>
+    <include src="modules/header.html"></include>
     <main class="container" x-cloak>
       <div x-show="tela == 'inicio'">
         <h3>Jogos</h3>
@@ -22,7 +22,7 @@
         >
           Gerenciar
         </a>
-        <button x-show="! jogo" @click="novoJogo">Abrir</button>
+        <a class="button" x-show="! jogo" href="#addJogo">Abrir</a>
         <a class="button" x-show="jogos.length" href="#jogos">Consultar</a>
         <hr />
         <h3>Administradores</h3>
@@ -32,9 +32,19 @@
         <h3>Usuários</h3>
         <a class="button" href="#usuarios">Consultar</a>
       </div>
+      <template x-if="tela == 'addJogo'">
+        <form x-data="{ titulo: '' }" @submit.prevent="novoJogo(titulo)">
+          <label>
+            Título
+            <input x-model="titulo" minlength="4" required />
+          </label>
+          <button type="button" @click="abrir('inicio')">Cancelar</button>
+          <input type="submit" />
+        </form>
+      </template>
       <div x-show="tela == 'jogo'">
         <h3>Gerenciamento de jogos</h3>
-        <a href="#inicio" class="button">Voltar</a>
+        <button @click="abrir('inicio')">Voltar</button>
         <button @click="encerrarJogo">Cancelar jogo</button>
         <button @click="chamarNumero">Chamar número</button>
         <p>
@@ -59,7 +69,7 @@
           x-data="{ tel: '', get comuns() { return usuarios.filter(v => !v.admin) } }"
         >
           <h3>Adicionar administrador</h3>
-          <a href="#inicio" class="button">Voltar</a>
+          <button @click="abrir('inicio')">Voltar</button>
           <label>
             Telefone
             <input x-model="tel" list="usuarios" />
@@ -98,7 +108,7 @@
       >
         <h3 x-show="admins">Administradores</h3>
         <h3 x-show="! admins">Usuários</h3>
-        <a href="#inicio" class="button">Voltar</a>
+        <button @click="abrir('inicio')">Voltar</button>
         <template
           x-data="{ get filtrados() { return usuarios.filter(v => v.admin == admins) } }"
           x-for="u in filtrados"

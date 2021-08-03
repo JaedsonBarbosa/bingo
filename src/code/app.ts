@@ -3,22 +3,14 @@ import { gerar } from './cartela'
 import Alpine from 'alpinejs'
 
 const webapp = () => ({
-  isAdmin: false,
   jogos: [] as IJogos[],
   encerrarSessao: () => auth.signOut(),
+  alterarDados: () => openLogin(),
   telefone: auth.currentUser?.phoneNumber,
   jogo: undefined as IJogo | undefined,
   cartela: undefined as ICartelaExtendida | undefined,
 
   init() {
-    const user = auth.currentUser!
-    if (user.uid === 'SwHkTu4OPmd42zhPKzYa5Wh3Y6i2') this.isAdmin = true
-    else {
-      usuarios
-        .doc(user.uid)
-        .get()
-        .then((v) => (this.isAdmin = v.get('admin')))
-    }
     jogos
       .orderBy('data', 'desc')
       .limit(20)
@@ -28,7 +20,7 @@ const webapp = () => ({
         this.jogo = j.data() as IJogo
         this.jogo.numeros.reverse()
         if (!this.cartela) {
-          const doc = await cartelas.doc(user!.uid).get()
+          const doc = await cartelas.doc(auth.currentUser!.uid).get()
           if (!doc.exists) return
           const { ganhou, numeros } = doc.data() as ICartela
           this.cartela = gerar(numeros, ganhou)

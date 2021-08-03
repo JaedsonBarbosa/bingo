@@ -11,27 +11,9 @@
     <link rel="stylesheet" href="style/webapp.css" />
     <script type="module" src="code/app.ts"></script>
   </head>
-  <body>
-    <header class="container">
-      <h3>Voice Bingo</h3>
-    </header>
-    <main class="container" x-data="webapp" x-cloak>
-      <p>
-        Logado no momento com o número
-        <span x-text="telefone"></span>
-        .
-      </p>
-
-      <button class="button-outline" @click="encerrarSessao">
-        Encerrar sessão
-      </button>
-      <a class="button button-outline" href="login.html">
-        Alterar dados cadastrais
-      </a>
-      <a x-show="isAdmin" class="button button-outline" href="adm.html">
-        Acessar painel administrativo
-      </a>
-
+  <body x-data="webapp">
+    <include src="modules/header.html"></include>
+    <main class="container" x-cloak>
       <div x-show="jogo">
         <hr />
         <h5>Jogo</h5>

@@ -7,25 +7,44 @@
     <link rel="icon" type="image/png" href="assets/logo.jpg" />
     <title>Login</title>
 
-    <link rel="stylesheet" href="style/login.scss" />
-    <script type="module" src="code/login.ts"></script>
+    <link rel="stylesheet" href="style/global.scss" />
+    <script defer type="module" src="code/login.ts"></script>
   </head>
   <body>
-    <div id="loginDialog"></div>
-    <main class="container" x-data="login" x-cloak x-show="exibir">
-      <h3>Cadastro</h3>
-      <form @submit.prevent="atualizar">
+    <include src="modules/minHeader.html"></include>
+    <main class="container" x-data="login" x-cloak>
+      <h3 x-show="iniciadoLogado">Atualizar cadastro</h3>
+      <h3 x-show="! iniciadoLogado">Iniciar sessão</h3>
+      <form x-show="pedirTelefone" @submit.prevent="proximo">
+        <label>
+          Telefone (com DDD)
+          <input x-model="telefone" minlength="8" required />
+        </label>
+        <input id="avancar" type="submit" />
+      </form>
+      <form
+        x-data="{ codigo: '' }"
+        x-show="pedirCodigo"
+        @submit.prevent="logar(codigo)"
+      >
+        <label>
+          Código
+          <input x-model="codigo" minlength="4" required />
+        </label>
+        <input type="submit" />
+      </form>
+      <form x-show="exibir" @submit.prevent="atualizar">
         <label>
           Nome
-          <input x-model="nome" minlength="2" />
+          <input x-model="nome" minlength="2" required />
         </label>
         <label>
           Estado
-          <input x-model="estado" minlength="2" />
+          <input x-model="estado" minlength="2" required />
         </label>
         <label>
           Município
-          <input x-model="municipio" minlength="2" />
+          <input x-model="municipio" minlength="2" required />
         </label>
         <input type="submit" />
       </form>

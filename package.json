@@ -2,11 +2,11 @@
   "scripts": {
     "postinstall": "patch-package",
     "start": "run-p start:*",
-    "start:parcel": "parcel watch src/index.html --dist-dir public",
+    "start:parcel": "parcel watch src/index.html src/app.html src/adm.html src/login.html --dist-dir public",
     "start:firebase": "firebase emulators:start --import .save-data --export-on-exit",
     "publish": "run-s publish:*",
     "publish:clean": "rmdir /s /q public",
-    "publish:build": "parcel build src/index.html --dist-dir public --no-source-maps",
+    "publish:build": "parcel build src/index.html src/app.html src/adm.html src/login.html --dist-dir public --no-source-maps",
     "publish:firebase": "firebase deploy"
   },
   "devDependencies": {
@@ -14,13 +14,11 @@
     "npm-check-updates": "^11.8.3",
     "npm-run-all": "^4.1.5",
     "parcel": "^2.0.0-beta.3.1",
-    "patch-package": "^6.4.7",
     "posthtml-include": "^1.7.1"
   },
   "dependencies": {
     "alpinejs": "^3.2.2",
     "firebase": "^8.8.1",
-    "firebaseui": "^4.8.1",
     "milligram": "^1.4.1"
   }
 }
