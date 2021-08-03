@@ -102,33 +102,7 @@
           </template>
         </div>
       </template>
-      <div
-        x-data="{ get admins() { return tela == 'admins' } }"
-        x-show="admins || tela == 'usuarios'"
-      >
-        <h3 x-show="admins">Administradores</h3>
-        <h3 x-show="! admins">Usuários</h3>
-        <button @click="abrir('inicio')">Voltar</button>
-        <template
-          x-data="{ get filtrados() { return usuarios.filter(v => v.admin == admins) } }"
-          x-for="u in filtrados"
-        >
-          <details>
-            <summary x-text="u.nome"></summary>
-            <p>
-              Telefone:
-              <span x-text="u.telefone"></span>
-              <br />
-              Estado:
-              <span x-text="u.estado"></span>
-              <br />
-              Município
-              <span x-text="u.municipio"></span>
-            </p>
-            <button @click="u.inverterAdmin">Remover</button>
-          </details>
-        </template>
-      </div>
+      <include src="modules/usuarios.html"></include>
     </main>
   </body>
 </html>

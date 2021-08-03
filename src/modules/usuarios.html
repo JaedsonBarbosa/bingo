@@ -1,0 +1,49 @@
+<div
+  x-data="{ get admins() { return tela == 'admins' } }"
+  x-show="admins || tela == 'usuarios'"
+>
+  <h3 x-show="admins">Administradores</h3>
+  <h3 x-show="! admins">Usuários</h3>
+  <button @click="abrir('inicio')">Voltar</button>
+  <button @click="$refs.filtrarUsuarios.showModal()">Filtrar</button>
+  <dialog x-ref="filtrarUsuarios">
+    <form method="dialog" @submit="carregarUsuarios">
+      <label>
+        Nome
+        <input x-model="filtroUsuarios.nome" minlength="1" />
+      </label>
+      <label>
+        Estado
+        <select x-model="filtroUsuarios.ufOrganizador">
+          <option></option>
+          <template x-for="e in ufs">
+            <option x-text="e.Nome"></option>
+          </template>
+        </select>
+      </label>
+      <button type="button" @click="$refs.filtrarUsuarios.close()">
+        Cancelar
+      </button>
+      <input type="submit" />
+    </form>
+  </dialog>
+  <template
+    x-data="{ get filtrados() { return usuarios.filter(v => v.admin == admins) } }"
+    x-for="u in filtrados"
+  >
+    <details>
+      <summary x-text="u.nome"></summary>
+      <p>
+        Telefone:
+        <span x-text="u.telefone"></span>
+        <br />
+        Estado:
+        <span x-text="u.estado"></span>
+        <br />
+        Município
+        <span x-text="u.municipio"></span>
+      </p>
+      <button @click="u.inverterAdmin">Remover</button>
+    </details>
+  </template>
+</div>

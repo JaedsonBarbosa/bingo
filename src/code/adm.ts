@@ -7,7 +7,6 @@ import {
   FieldValue,
   usuarios,
   openLogin,
-  openApp,
 } from './commom'
 import Alpine from 'alpinejs'
 import IBGE from './IBGE'
@@ -30,11 +29,11 @@ const admin = () => ({
   filtroJogos: {
     ufOrganizador: '',
     ufGanhador: '',
-    ateData: ''
+    ateData: '',
   },
 
   carregarJogos() {
-    let query = jogos.orderBy('data', 'desc').limit(20)
+    let query = jogos.orderBy('data', 'desc').limit(10)
     const ufOrg = this.filtroJogos.ufOrganizador
     if (ufOrg) query = query.where('organizador.estado', '==', ufOrg)
     const ufGan = this.filtroJogos.ufGanhador
@@ -46,6 +45,36 @@ const admin = () => ({
       .then((v) => (this.jogos = v.docs.map((k) => k.data() as IJogos)))
   },
 
+  filtroUsuarios: {
+    nome: '',
+    uf: '',
+  },
+
+  carregarUsuarios() {
+    console.log(this.filtroUsuarios)
+    let query = usuarios.orderBy('nome', 'asc').limit(10)
+    const nome = this.filtroUsuarios.nome
+    if (nome) {
+      // const next = (c: string) => String.fromCharCode(c.charCodeAt(0) + 1)
+      // const end = nome.replace(/.$/, next)
+      query = query.where('nome', '>=', nome) //.where('nome', '<', end)
+    }
+    const uf = this.filtroUsuarios.uf
+    if (uf) query = query.where('estado', '==', uf)
+    query.get().then(
+      (v) => {
+        this.usuarios = v.docs.map((v) => ({
+          ...(v.data() as IUsuario),
+          inverterAdmin: async () => {
+            await v.ref.update({ admin: !v.get('admin') })
+            this.abrir('inicio')
+          },
+        }))
+      },
+      () => alert('Aparentemente não estamos conseguindo acessar os usuários.')
+    )
+  },
+
   init() {
     const updateTela = () => {
       const hash = window.location.hash.substr(1)
@@ -54,15 +83,7 @@ const admin = () => ({
     window.onhashchange = updateTela
     updateTela()
     this.carregarJogos()
-    usuarios.onSnapshot((v) => {
-      this.usuarios = v.docs.map((v) => ({
-        ...(v.data() as IUsuario),
-        inverterAdmin: async () => {
-          await v.ref.update({ admin: !v.get('admin') })
-          this.abrir('inicio')
-        },
-      }))
-    }, openApp)
+    this.carregarUsuarios()
     jogo.onSnapshot((j) => {
       this.jogo = j.data() as IJogo
       this.jogo?.numeros.reverse()

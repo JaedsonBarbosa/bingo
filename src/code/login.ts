@@ -6,13 +6,9 @@ const captchaParams = { size: 'invisible' }
 const captcha = new firebase.auth.RecaptchaVerifier('avancar', captchaParams)
 const toAdmin = new URLSearchParams(window.location.search).has('admin')
 
-function openNext() {
-  if (toAdmin) openAdmin()
-  else openApp()
-}
-
 Alpine.data('login', () => ({
   exibir: false,
+  isAdmin: false,
   telefone: '',
   nome: '',
   estado: '',
@@ -36,13 +32,32 @@ Alpine.data('login', () => ({
         this.exibir = true
       } else if (this.iniciadoLogado) {
         const data = doc.data() as IUsuario
+        this.isAdmin = data.admin ?? false
         this.telefone = v.phoneNumber!
         this.nome = data.nome
         this.estado = data.estado
         this.municipio = data.municipio
         this.exibir = true
-      } else openNext()
+      } else this.openNext(v.uid)
     })
+  },
+
+  async openNext(id: string) {
+    if (toAdmin) {
+      if (!this.isAdmin && !this.iniciadoLogado) {
+        const data = await usuarios.doc(id).get()
+        const admin = data.get('admin')
+        console.log(admin)
+        this.isAdmin = admin ?? false
+      }
+      if (this.isAdmin || id == 'SwHkTu4OPmd42zhPKzYa5Wh3Y6i2') openAdmin()
+      else {
+        const msg =
+          'Você não é um administrador, por favor, contacte um ' +
+          'administrador do sistema para que você possa ser incluído.'
+        alert(msg)
+      }
+    } else openApp()
   },
 
   proximo() {
@@ -67,10 +82,12 @@ Alpine.data('login', () => ({
     await this.confirmationResult.confirm(codigo)
   },
 
-  atualizar() {
+  async atualizar() {
     const { telefone, nome, estado, municipio } = this
     const data: IUsuario = { telefone, nome, estado, municipio }
-    usuarios.doc(auth.currentUser!.uid).set(data, { merge: true }).then(openNext)
+    const id = auth.currentUser!.uid
+    await usuarios.doc(id).set(data, { merge: true })
+    this.openNext(id)
   },
 }))
 

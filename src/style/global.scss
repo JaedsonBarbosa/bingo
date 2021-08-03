@@ -33,6 +33,10 @@ header {
 }
 
 dialog {
+  &::backdrop {
+    backdrop-filter: blur(5px);
+  }
+
   form {
     margin-bottom: 0;
   }
