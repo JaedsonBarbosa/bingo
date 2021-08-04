@@ -19,7 +19,7 @@ const admin = () => ({
   alterarDados: () => openLogin(true),
   telefone: auth.currentUser!.phoneNumber,
   jogo: undefined as IJogo | undefined,
-  numeros: [] as string[],
+  ultimoNumero: undefined as string | undefined,
   usuarios: [] as IUsuarioExtendido[],
 
   abrir(tela: string) {
@@ -88,10 +88,12 @@ const admin = () => ({
     this.carregarUsuarios()
     jogo.onSnapshot((j) => {
       this.jogo = j.data() as IJogo
-      const numeros = this.jogo?.numeros
-        .map((v) => getLetra(v) + ' ' + v)
-        .reverse()
-      this.numeros = numeros ?? []
+      if (this.jogo) {
+        const numeros = this.jogo.numeros
+        const last = numeros[numeros.length - 1]
+        this.ultimoNumero = getLetra(last) + ' ' + last
+        this.jogo.numeros.sort((a,b) => a - b)
+      } else this.ultimoNumero = undefined
     })
     cartelas.where('ganhou', '==', true).onSnapshot(async (v) => {
       if (v.empty) return

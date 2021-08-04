@@ -47,13 +47,13 @@
         <button @click="abrir('inicio')">Voltar</button>
         <button @click="encerrarJogo">Cancelar jogo</button>
         <button @click="chamarNumero">Chamar número</button>
-        <p x-show="numeros.length">
+        <p x-show="jogo?.numeros.length">
           Números chamados:
-          <em x-text="numeros.join(', ')"></em>
+          <em x-text="jogo?.numeros.join(', ')"></em>
         </p>
         <p aria-live="assertive">
           Último número:
-          <em x-text="numeros[0] ?? 'Aguardando...'"></em>
+          <em x-text="ultimoNumero ?? 'Aguardando...'"></em>
         </p>
         <p>
           Quantidade de números chamados:
