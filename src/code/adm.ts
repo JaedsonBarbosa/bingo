@@ -10,6 +10,7 @@ import {
 } from './commom'
 import Alpine from 'alpinejs'
 import IBGE from './IBGE'
+import { getLetra } from './cartela'
 
 const admin = () => ({
   tela: '',
@@ -18,6 +19,7 @@ const admin = () => ({
   alterarDados: () => openLogin(true),
   telefone: auth.currentUser!.phoneNumber,
   jogo: undefined as IJogo | undefined,
+  numeros: [] as string[],
   usuarios: [] as IUsuarioExtendido[],
 
   abrir(tela: string) {
@@ -86,7 +88,10 @@ const admin = () => ({
     this.carregarUsuarios()
     jogo.onSnapshot((j) => {
       this.jogo = j.data() as IJogo
-      this.jogo?.numeros.reverse()
+      const numeros = this.jogo?.numeros
+        .map((v) => getLetra(v) + ' ' + v)
+        .reverse()
+      this.numeros = numeros ?? []
     })
     cartelas.where('ganhou', '==', true).onSnapshot(async (v) => {
       if (v.empty) return
@@ -110,7 +115,7 @@ const admin = () => ({
     await lote.commit()
     this.abrir('inicio')
   },
-
+  //Interessante separar o arquivo em subcontextos e subtelas independentes
   async novoJogo(titulo: string) {
     const userDB = await usuarios.doc(auth.currentUser!.uid).get()
     const organizador = userDB.data() as IUsuario

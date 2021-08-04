@@ -7,6 +7,8 @@ export { firebase }
 firebase.initializeApp(JSON.parse(process.env.firebaseConfig as string))
 
 export const db = firebase.firestore()
+db.settings({ cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED })
+
 export const auth = firebase.auth()
 
 if (process.env.NODE_ENV === 'development') {
@@ -14,7 +16,11 @@ if (process.env.NODE_ENV === 'development') {
   auth.useEmulator('http://localhost:9099')
 }
 
-auth.useDeviceLanguage();
+db.enablePersistence()
+  .then(() => console.log('Ativado cache'))
+  .catch(() => console.log('Falha ao tentar ativar o cache.'))
+
+auth.useDeviceLanguage()
 
 export const FieldValue = firebase.firestore.FieldValue
 

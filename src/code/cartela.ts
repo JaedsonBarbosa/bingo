@@ -31,6 +31,12 @@ function filtrarColunasCartela(nums: number[]): IColunas {
   return { b, i, n, g, o }
 }
 
+export function getLetra(n: number) {
+  const cols = ['B', 'I', 'N', 'G', 'O']
+  const index = Math.floor((n - 1)/15)
+  return cols[index]
+}
+
 function calcularLinhasCartela(cols: IColunas) {
   /** @type {number[][]} */
   const linhas: number[][] = [[], [], [], [], []]
