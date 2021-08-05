@@ -32,6 +32,9 @@ interface ICartela {
   numeros: number[]
 }
 
-interface ICartelaExtendida extends ICartela {
-  linhas: number[][]
+interface INumeroCartela {
+  v: number
+  m: boolean
 }
+
+type ICartelaExtendida = INumeroCartela[][]

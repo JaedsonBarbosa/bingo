@@ -1,54 +1,52 @@
-import { auth, jogos, cartelas, jogo, usuarios, openLogin } from './commom'
+import { auth, cartelas, jogo, openLogin } from './commom'
 import { gerar } from './cartela'
 import Alpine from 'alpinejs'
+import { getLetra } from './cartela'
 
 const webapp = () => ({
-  jogos: [] as IJogos[],
-  encerrarSessao: () => auth.signOut(),
-  alterarDados: () => openLogin(),
-  telefone: auth.currentUser?.phoneNumber,
-  jogo: undefined as IJogo | undefined,
+  tela: '',
+  numeros: [] as { v: number; c: string }[],
   cartela: undefined as ICartelaExtendida | undefined,
 
+  abrir(tela: string) {
+    window.open('#' + tela, '_self')
+  },
+
   init() {
-    jogos
-      .orderBy('data', 'desc')
-      .limit(20)
-      .onSnapshot((v) => (this.jogos = v.docs.map((k) => k.data() as IJogos)))
+    const updateTela = () => {
+      const hash = window.location.hash.substr(1)
+      this.tela = hash ? hash : 'inicio'
+    }
+    window.onhashchange = updateTela
+    updateTela()
     jogo.onSnapshot(async (j) => {
       if (j.exists) {
-        this.jogo = j.data() as IJogo
-        this.jogo.numeros.reverse()
+        const jogo = j.data() as IJogo
+        this.numeros = jogo.numeros
+          .map((v) => ({ v, c: getLetra(v) }))
+          .reverse()
         if (!this.cartela) {
           const doc = await cartelas.doc(auth.currentUser!.uid).get()
           if (!doc.exists) return
-          const { ganhou, numeros } = doc.data() as ICartela
-          this.cartela = gerar(numeros, ganhou)
+          const { numeros } = doc.data() as ICartela
+          this.cartela = gerar(numeros)
         }
       } else {
-        this.jogo = undefined
+        this.numeros = []
         this.cartela = undefined
       }
     })
   },
 
   async bingo() {
-    if (!this.cartela || !this.jogo) return
-    const numsCartela = this.cartela.numeros
-    const numsJogo = this.jogo.numeros
-    if (numsCartela.some((v) => !numsJogo.includes(v))) {
-      const nums = numsCartela.filter((n) => !numsJogo.includes(n)).join(', ')
-      alert('Você errou, faltam os números: ' + nums)
-    } else {
-      await cartelas.doc(auth.currentUser!.uid).update({ ganhou: true })
-      alert('Parabéns, você ganhou!')
-    }
+    await cartelas.doc(auth.currentUser!.uid).update({ ganhou: true })
+    alert('Parabéns, você ganhou!')
   },
 
   async participar() {
     const cartela = gerar()
-    const { ganhou, numeros } = cartela
-    await cartelas.doc(auth.currentUser!.uid).set({ ganhou, numeros })
+    const numeros = cartela.flatMap((v) => v.map((k) => k.v))
+    await cartelas.doc(auth.currentUser!.uid).set({ ganhou: false, numeros })
     this.cartela = cartela
   },
 })

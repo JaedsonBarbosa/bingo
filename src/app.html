@@ -8,38 +8,55 @@
     <title>Voice Bingo</title>
 
     <link rel="stylesheet" href="style/global.scss" />
-    <link rel="stylesheet" href="style/webapp.css" />
+    <link rel="stylesheet" href="style/app.scss" />
     <script type="module" src="code/app.ts"></script>
   </head>
   <body x-data="webapp">
-    <include src="modules/header.html"></include>
-    <main class="container" x-cloak>
-      <div x-show="jogo">
-        <hr />
-        <h5>Jogo</h5>
-        <div x-show="cartela">
-          <p>
-            Números chamados:
-            <em
-              x-data="{ get numeros() { return jogo?.numeros.join(', ') } }"
-              x-text="numeros ? numeros : 'Aguardando...'"
-            ></em>
-          </p>
-          <p aria-live="assertive">
-            Último número:
-            <em x-text="jogo?.numeros[0] ?? 'Aguardando...'"></em>
-          </p>
-          <include src="./modules/cartela.html"></include>
-          <button @click="bingo">BINGO</button>
+    <template x-if="tela == 'inicio'">
+      <header class="header">
+        <div class="container">
+          <img
+            src="assets/logo.jpg"
+            title="Uma cartela de bingo, com o símbolo de acessibilidade no centro."
+          />
+          <div class="div">
+            <h1>VoiceBingo</h1>
+            <em>Inclusivo e na palma da sua mão</em>
+          </div>
         </div>
-        <div x-show="! cartela">
-          <div x-show="jogo?.numeros.length">
+      </header>
+    </template>
+    <template x-if="tela != 'inicio'">
+      <header style="padding: 2rem">
+        <button style="margin: 0">Voltar</button>
+      </header>
+    </template>
+    <main class="container" x-cloak>
+      <template x-if="tela == 'inicio'">
+        <div>
+          <h3>Jogar</h3>
+          <button @click="abrir('jogo')">Online</button>
+          <button @click="abrir('jogo')">Offline</button>
+        </div>
+      </template>
+      <template x-if="tela == 'jogo' && cartela">
+        <div class="grid">
+          <div>B</div>
+          <div>I</div>
+          <div>N</div>
+          <div>G</div>
+          <div>O</div>
+        </div>
+      </template>
+      <template x-if="tela == 'jogo' && ! cartela">
+        <div>
+          <div x-show="numeros.length">
             <p>
               Um jogo está em execução neste momento, mas você não está
               participando.
             </p>
           </div>
-          <div x-show="! jogo?.numeros.length">
+          <div x-show="! numeros.length">
             <p>
               Um jogo está prester a começar, se desejas participar, basta
               clicar no botão abaixo.
@@ -47,20 +64,6 @@
             <button @click="participar">Participar</button>
           </div>
         </div>
-      </div>
-
-      <div x-show="jogos.length">
-        <hr />
-        <h5>Histórico de jogos</h5>
-        <template x-for="j in jogos">
-          <details>
-            <summary x-text="j.titulo"></summary>
-            <p>
-              Ganhador:
-              <span x-text="j.ganhador.nome"></span>
-            </p>
-          </details>
-        </template>
       </div>
     </main>
   </body>

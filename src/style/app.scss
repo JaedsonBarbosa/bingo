@@ -1,0 +1,19 @@
+body {
+  height: 100vh;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: auto auto auto auto auto;
+
+  div {
+    text-align: center;
+    height: 4rem;
+    line-height: 4rem;
+    border: solid black;
+    border-width: 1px 0;
+    &:nth-child(odd) {
+      border-width: 1px;
+    }
+  }
+}
