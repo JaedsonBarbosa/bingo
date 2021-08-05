@@ -39,14 +39,12 @@
           <button @click="abrir('jogo')">Offline</button>
         </div>
       </template>
-      <template x-if="tela == 'jogo' && cartela">
-        <div class="grid">
-          <div>B</div>
-          <div>I</div>
-          <div>N</div>
-          <div>G</div>
-          <div>O</div>
-        </div>
+      <template x-if="tela == 'jogo' && cartela.length">
+        <include src="modules/cartela.html">
+          {
+            "colunas": ["B", "I", "N", "G", "O"]
+          }
+        </include>
       </template>
       <template x-if="tela == 'jogo' && ! cartela">
         <div>
@@ -64,7 +62,7 @@
             <button @click="participar">Participar</button>
           </div>
         </div>
-      </div>
+      </template>
     </main>
   </body>
 </html>

@@ -3,17 +3,29 @@ body {
 }
 
 .grid {
+  max-width: 40rem;
+  margin-left: 0;
   display: grid;
   grid-template-columns: auto auto auto auto auto;
+  border: solid black;
+  border-width: 0 0 1px 1px;
 
   div {
+    position: relative;
     text-align: center;
-    height: 4rem;
-    line-height: 4rem;
+    height: 6rem;
+    line-height: 6rem;
     border: solid black;
-    border-width: 1px 0;
-    &:nth-child(odd) {
-      border-width: 1px;
+    border-width: 1px 1px 0 0;
+
+    img {
+      height: 4rem;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      margin: auto;
     }
   }
 }

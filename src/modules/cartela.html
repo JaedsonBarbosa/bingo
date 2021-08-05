@@ -1,44 +1,22 @@
-<div class="cartela">
-  <div>B</div>
-  <div>I</div>
-  <div>N</div>
-  <div>G</div>
-  <div>O</div>
+<div class="grid">
+  <each loop="item, index in colunas">
+    <div>
+      <strong>{{ item }}</strong>
+    </div>
+  </each>
+  <each loop="l in [0, 1, 2, 3, 4]">
+    <each loop="col, c in colunas">
+      <if condition="l == 2 && c == 2">
+        <div>
+          <img
+            src="assets/logo.jpg"
+            title="Uma cartela de bingo, com o símbolo de acessibilidade no centro."
+          />
+        </div>
+      </if>
+      <else>
+        <div x-text="cartela[{{c}}][{{l}}].v"></div>
+      </else>
+    </each>
+  </each>
 </div>
-
-<!-- <table>
-  <thead>
-    <tr>
-      <th scope="col">B</th>
-      <th scope="col">I</th>
-      <th scope="col">N</th>
-      <th scope="col">G</th>
-      <th scope="col">O</th>
-    </tr>
-  </thead>
-  <tbody>
-    <template x-for="l in cartela?.linhas ?? []">
-      <tr>
-        <template x-for="c in l">
-          <td
-            x-data="{ marcado: false, comum: c != -1, get texto() { return `${c} ${this.marcado ? 'Sim' : 'Não'}` } }"
-            :class="{ 'marcado': marcado, 'comum': comum }"
-            @click="marcado = ! marcado"
-            :aria-label="texto"
-          >
-            <template x-if="comum">
-              <span x-show="comum" x-text="c"></span>
-            </template>
-            <template x-if="! comum">
-              <img
-                src="assets/logo.jpg"
-                title="Uma cartela de bingo, com o símbolo de acessibilidade no centro."
-                aria-label="Logotipo"
-              />
-            </template>
-          </td>
-        </template>
-      </tr>
-    </template>
-  </tbody>
-</table> -->

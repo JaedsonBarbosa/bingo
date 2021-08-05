@@ -36,5 +36,3 @@ interface INumeroCartela {
   v: number
   m: boolean
 }
-
-type ICartelaExtendida = INumeroCartela[][]

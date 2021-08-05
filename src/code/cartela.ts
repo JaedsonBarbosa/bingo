@@ -1,13 +1,17 @@
 function filtrarColunasCartela(nums: number[]): INumeroCartela[][] {
   const sort = (a: number, b: number) => a - b
   const map = (v: number) => ({ v, m: false })
-  return [...Array(5)].map((_, i) =>
+  const res = [...Array(5)].map((_, i) =>
     nums
       .filter((v) => v > 15 * i && v <= 15 * (i + 1))
       .slice(0, 5)
       .sort(sort)
       .map(map)
   )
+  res[2][4] = res[2][3]
+  res[2][3] = res[2][2]
+  res[2][2] = { v: 0, m: false }
+  return res
 }
 
 export function getLetra(n: number) {
@@ -25,7 +29,7 @@ function misturar(array: number[]) {
   }
 }
 
-export function gerar(nums?: number[]): ICartelaExtendida {
+export function gerar(nums?: number[]): INumeroCartela[][] {
   if (!nums) {
     const nums = [...Array(75)].map((_, i) => i + 1)
     misturar(nums)

@@ -5,8 +5,9 @@ import { getLetra } from './cartela'
 
 const webapp = () => ({
   tela: '',
+  colunas: ['B', 'I', 'N', 'G', 'O'],
   numeros: [] as { v: number; c: string }[],
-  cartela: undefined as ICartelaExtendida | undefined,
+  cartela: [] as INumeroCartela[][],
 
   abrir(tela: string) {
     window.open('#' + tela, '_self')
@@ -25,7 +26,7 @@ const webapp = () => ({
         this.numeros = jogo.numeros
           .map((v) => ({ v, c: getLetra(v) }))
           .reverse()
-        if (!this.cartela) {
+        if (!this.cartela.length) {
           const doc = await cartelas.doc(auth.currentUser!.uid).get()
           if (!doc.exists) return
           const { numeros } = doc.data() as ICartela
@@ -33,7 +34,7 @@ const webapp = () => ({
         }
       } else {
         this.numeros = []
-        this.cartela = undefined
+        this.cartela = []
       }
     })
   },
