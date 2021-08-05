@@ -27,42 +27,37 @@
       </header>
     </template>
     <template x-if="tela != 'inicio'">
-      <header style="padding: 2rem">
+      <header class="container" style="padding: 2rem">
         <button style="margin: 0">Voltar</button>
       </header>
     </template>
     <main class="container" x-cloak>
-      <template x-if="tela == 'inicio'">
-        <div>
-          <h3>Jogar</h3>
-          <button @click="abrir('jogo')">Online</button>
-          <button @click="abrir('jogo')">Offline</button>
+      <div x-show="tela == 'inicio'">
+        <h3>Jogar</h3>
+        <button @click="abrir('jogo')">Online</button>
+        <button @click="abrir('jogo')">Offline</button>
+      </div>
+      <include src="modules/cartela.html">
+        { "colunas": ["B", "I", "N", "G", "O"] }
+      </include>
+      <div x-show="tela == 'jogo' && !cartela.length">
+        <div x-show="numeros.length">
+          <p>
+            Um jogo está em execução neste momento, mas você não está
+            participando.
+          </p>
         </div>
-      </template>
-      <template x-if="tela == 'jogo' && cartela.length">
-        <include src="modules/cartela.html">
-          {
-            "colunas": ["B", "I", "N", "G", "O"]
-          }
-        </include>
-      </template>
-      <template x-if="tela == 'jogo' && ! cartela">
-        <div>
-          <div x-show="numeros.length">
-            <p>
-              Um jogo está em execução neste momento, mas você não está
-              participando.
-            </p>
-          </div>
-          <div x-show="! numeros.length">
-            <p>
-              Um jogo está prester a começar, se desejas participar, basta
-              clicar no botão abaixo.
-            </p>
-            <button @click="participar">Participar</button>
-          </div>
+        <div x-show="! numeros.length">
+          <p>
+            Um jogo está prester a começar, se desejas participar, basta
+            clicar no botão abaixo.
+          </p>
+          <button @click="participar">Participar</button>
         </div>
-      </template>
+      </div>
+      <div x-show="tela == 'vitoria'">
+        <h1>Vitória!</h1>
+      </div>
     </main>
   </body>
 </html>

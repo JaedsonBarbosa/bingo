@@ -2,9 +2,34 @@ body {
   height: 100vh;
 }
 
+.numeros {
+  white-space: nowrap;
+  overflow-x: auto;
+  margin-bottom: 1rem;
+
+  div {
+    display: inline-block;
+    width: 4rem;
+    height: 4rem;
+    line-height: 4rem;
+    margin: 0 2rem 1rem 0;
+    background: lightgray;
+    border: 1px solid black;
+    text-align: center;
+    border-radius: 50%;
+
+    &:first-of-type {
+      width: 6rem;
+      height: 6rem;
+      line-height: 6rem;
+    }
+  }
+}
+
 .grid {
   max-width: 40rem;
   margin-left: 0;
+  margin-bottom: 1rem;
   display: grid;
   grid-template-columns: auto auto auto auto auto;
   border: solid black;
@@ -19,13 +44,22 @@ body {
     border-width: 1px 1px 0 0;
 
     img {
-      height: 4rem;
+      height: 6rem;
       position: absolute;
+      z-index: -1;
       left: 0;
       right: 0;
       top: 0;
       bottom: 0;
       margin: auto;
+    }
+
+    &.numero {
+      cursor: pointer;
+
+      &.marcado {
+        background-color: #efefef;
+      }
     }
   }
 }

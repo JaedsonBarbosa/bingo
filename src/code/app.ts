@@ -5,13 +5,8 @@ import { getLetra } from './cartela'
 
 const webapp = () => ({
   tela: '',
-  colunas: ['B', 'I', 'N', 'G', 'O'],
   numeros: [] as { v: number; c: string }[],
   cartela: [] as INumeroCartela[][],
-
-  abrir(tela: string) {
-    window.open('#' + tela, '_self')
-  },
 
   init() {
     const updateTela = () => {
@@ -24,8 +19,9 @@ const webapp = () => ({
       if (j.exists) {
         const jogo = j.data() as IJogo
         this.numeros = jogo.numeros
-          .map((v) => ({ v, c: getLetra(v) }))
           .reverse()
+          .slice(0, 5)
+          .map((v) => ({ v, c: getLetra(v) }))
         if (!this.cartela.length) {
           const doc = await cartelas.doc(auth.currentUser!.uid).get()
           if (!doc.exists) return
@@ -39,9 +35,32 @@ const webapp = () => ({
     })
   },
 
-  async bingo() {
-    await cartelas.doc(auth.currentUser!.uid).update({ ganhou: true })
-    alert('Parabéns, você ganhou!')
+  abrir(tela: string) {
+    window.open('#' + tela, '_self')
+  },
+
+  getMarcados(cartela: INumeroCartela[][]) {
+    const nCartelas = cartela.flatMap((v) => v.filter((k) => k.m))
+    const vitoria =
+      nCartelas.length == 24 &&
+      nCartelas.every((v) => this.numeros.some((k) => k.v == v.v))
+    if (vitoria)
+      cartelas
+        .doc(auth.currentUser!.uid)
+        .update({ ganhou: true })
+        .then(() => this.abrir('vitoria'))
+    return nCartelas.length
+  },
+
+  validarMarcacoes() {
+    const n = this.numeros.map((v) => v.v)
+    const nCartelas = this.cartela.flat()
+    nCartelas
+      .filter((v) => v.m && !n.includes(v.v))
+      .forEach((v) => (v.m = false)) // Marcações erradas
+    nCartelas
+      .filter((v) => !v.m && n.includes(v.v))
+      .forEach((v) => (v.m = true)) // Marcações ignoradas
   },
 
   async participar() {
