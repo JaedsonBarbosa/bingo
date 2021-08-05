@@ -21,6 +21,7 @@
           />
           <div class="div">
             <h1>VoiceBingo</h1>
+            <br />
             <em>Inclusivo e na palma da sua mão</em>
           </div>
         </div>
@@ -38,7 +39,11 @@
         <button @click="abrir('jogo')">Offline</button>
       </div>
       <include src="modules/cartela.html">
-        { "colunas": ["B", "I", "N", "G", "O"] }
+        {
+          "cores": ["vermelho", "verde", "azul", "amarelo", "roxo"],
+          "colunas": ["B", "I", "N", "G", "O"],
+          "online": false
+        }
       </include>
       <div x-show="tela == 'jogo' && !cartela.length">
         <div x-show="numeros.length">

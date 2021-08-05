@@ -7,7 +7,7 @@
   <div class="grid">
     <each loop="item, i in colunas">
       <div
-        style="font-weight: bold"
+        class="{{cores[i]}} marcado"
         x-data="{ get r() { return cartela[{{i}}]?.filter(v => !v.m).map(v => v.v) ?? [] } }"
         :title="r.length ? `{{item}}: ${r.join(', ')}` : 'Todos marcados'"
       >
@@ -26,21 +26,30 @@
         </if>
         <else>
           <div
-            class="numero"
+            class="numero {{cores[c]}}"
             x-data="{ get d() { return cartela[{{c}}]?.[{{l}}] ?? {} } }"
             x-text="d.v"
             :class="d.m && 'marcado'"
-            :title="`${d.v} ${d.m ? 'Sim' : 'Não'}`"
+            :title="d.v + (d.m ? ' marcado' : '')"
             @click="d.m = !d.m"
           ></div>
         </else>
       </each>
     </each>
   </div>
+  <span class="button" x-text="`${getMarcados(cartela)} / 24`"></span>
   <button
-    x-data="{ get n() { return getMarcados(cartela) } }"
-    :title="`Marcados ${n} números, clique para validar suas marcações`"
-    x-text="`${n} / 24`"
-    @click="validarMarcacoes"
-  ></button>
+    x-show="numeros.length && modo == 'manual'"
+    title="Mudar para modo automático"
+    @click="automatico"
+  >
+    Manual
+  </button>
+  <button
+    x-show="numeros.length && modo == 'automatico'"
+    title="Mudar para modo manual"
+    @click="manual"
+  >
+    Automático
+  </button>
 </div>

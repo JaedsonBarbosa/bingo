@@ -6,6 +6,7 @@ import { getLetra } from './cartela'
 const webapp = () => ({
   tela: '',
   numeros: [] as { v: number; c: string }[],
+  modo: 'manual' as 'manual' | 'automatico',
   cartela: [] as INumeroCartela[][],
 
   init() {
@@ -20,8 +21,8 @@ const webapp = () => ({
         const jogo = j.data() as IJogo
         this.numeros = jogo.numeros
           .reverse()
-          .slice(0, 5)
           .map((v) => ({ v, c: getLetra(v) }))
+        if (this.modo == 'automatico') this.validarMarcacoes()
         if (!this.cartela.length) {
           const doc = await cartelas.doc(auth.currentUser!.uid).get()
           if (!doc.exists) return
@@ -61,6 +62,15 @@ const webapp = () => ({
     nCartelas
       .filter((v) => !v.m && n.includes(v.v))
       .forEach((v) => (v.m = true)) // Marcações ignoradas
+  },
+
+  manual() {
+    this.modo = 'manual'
+  },
+
+  automatico() {
+    this.modo = 'automatico'
+    this.validarMarcacoes()
   },
 
   async participar() {

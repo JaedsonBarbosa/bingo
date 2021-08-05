@@ -2,10 +2,15 @@ body {
   height: 100vh;
 }
 
+span.button {
+  cursor: default;
+}
+
 .numeros {
   white-space: nowrap;
   overflow-x: auto;
   margin-bottom: 1rem;
+  font-size: 2rem;
 
   div {
     display: inline-block;
@@ -22,6 +27,7 @@ body {
       width: 6rem;
       height: 6rem;
       line-height: 6rem;
+      font-weight: bold;
     }
   }
 }
@@ -43,6 +49,8 @@ body {
     border: solid black;
     border-width: 1px 1px 0 0;
 
+    font-size: 2rem;
+
     img {
       height: 6rem;
       position: absolute;
@@ -54,12 +62,47 @@ body {
       margin: auto;
     }
 
+    &.marcado {
+      font-weight: bold;
+    }
+
+    &.vermelho {
+      color: #a00;
+      &.marcado {
+        background-color: #fdd;
+      }
+    }
+
+    &.verde {
+      color: #0a0;
+      &.marcado {
+        background-color: #dfd;
+      }
+    }
+
+    &.azul {
+      color: #00a;
+      &.marcado {
+        background-color: #ddf;
+      }
+    }
+
+    &.amarelo {
+      color: #aa0;
+      &.marcado {
+        background-color: #ffd;
+      }
+    }
+
+    &.roxo {
+      color: #a0a;
+      &.marcado {
+        background-color: #fdf;
+      }
+    }
+
     &.numero {
       cursor: pointer;
-
-      &.marcado {
-        background-color: #efefef;
-      }
     }
   }
 }
