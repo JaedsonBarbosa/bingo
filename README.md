@@ -25,4 +25,4 @@ As colunas tem cores, as bolas devem ter as cores das colunas, a ultima bola dev
 automático ou manual, se automático o sistema recebe a bola e marca automaticamente, caso manual a marcação é feita pelo jogador
 som, por enquanto não faz nada
 os titulos de cada coluna devem falar os numeros que ainda não foram marcados, e se todos foram marcados, ele fala todos marcados
-AGORA APLICAMOS AS CORES NOS NUMEROS CHAMADOS E COLOCAMOS O VOICEBINGO NO CANTO SUPERIOR DIREITO
+CORRIGIR EXIBICAO DO LOG, PARA APAGAR SOZINHO, TESTAR O USO DE UM GET

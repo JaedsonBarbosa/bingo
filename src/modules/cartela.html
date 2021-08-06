@@ -1,55 +1,71 @@
-<div x-show="tela == 'jogo' && cartela.length">
-  <div class="numeros" x-show="numeros.length">
-    <template x-for="n in numeros">
-      <div x-text="n.v"></div>
-    </template>
-  </div>
-  <div class="grid">
-    <each loop="item, i in colunas">
-      <div
-        class="{{cores[i]}} marcado"
-        x-data="{ get r() { return cartela[{{i}}]?.filter(v => !v.m).map(v => v.v) ?? [] } }"
-        :title="r.length ? `{{item}}: ${r.join(', ')}` : 'Todos marcados'"
+<template x-if="tela == 'jogo'">
+  <div>
+    <div class="numeros" x-show="jogo">
+      <template
+        x-data="{ cols: ['B', 'I', 'N', 'G', 'O'] }"
+        x-for="(v,i) in jogo.numeros"
       >
-        {{ item }}
-      </div>
-    </each>
-    <each loop="l in [0, 1, 2, 3, 4]">
-      <each loop="v, c in colunas">
-        <if condition="l == 2 && c == 2">
-          <div>
-            <img
-              src="assets/logo.jpg"
-              title="Uma cartela de bingo, com o símbolo de acessibilidade no centro."
-            />
-          </div>
-        </if>
-        <else>
-          <div
-            class="numero {{cores[c]}}"
-            x-data="{ get d() { return cartela[{{c}}]?.[{{l}}] ?? {} } }"
-            x-text="d.v"
-            :class="d.m && 'marcado'"
-            :title="d.v + (d.m ? ' marcado' : '')"
-            @click="d.m = !d.m"
-          ></div>
-        </else>
+        <div
+          x-data="{ v: jogo.numeros[jogo.numeros.length - 1 - i] }"
+          :class="cols[Math.floor((v - 1) / 15)]"
+          class="forte"
+          x-text="v"
+        ></div>
+      </template>
+    </div>
+    <div class="grid">
+      <each loop="item in colunas">
+        <div
+          class="{{item}} forte"
+          x-data="{ get r() { return cartela[{{i}}]?.filter(v => !v.m).map(v => v.v) ?? [] } }"
+          :title="r.length ? `{{item}}: ${r.join(', ')}` : 'Todos marcados'"
+        >
+          {{ item }}
+        </div>
       </each>
-    </each>
+      <each loop="l in [0, 1, 2, 3, 4]">
+        <each loop="v, c in colunas">
+          <if condition="l == 2 && c == 2">
+            <div>
+              <img
+                src="assets/logo.jpg"
+                title="Uma cartela de bingo, com o símbolo de acessibilidade no centro."
+              />
+            </div>
+          </if>
+          <else>
+            <div
+              class="clicavel {{v}}"
+              x-data="{ get d() { return cartela[{{c}}]?.[{{l}}] ?? {} } }"
+              x-text="d.v"
+              :class="d.m && 'forte'"
+              :title="d.v + (d.m ? ' marcado' : '')"
+              @click="d.m = !d.m"
+            ></div>
+          </else>
+        </each>
+      </each>
+    </div>
+    <span class="button" x-text="`${getMarcados(cartela)} / 24`"></span>
+    <button
+      x-show="jogo && modo == 'manual'"
+      title="Mudar para modo automático"
+      @click="automatico"
+    >
+      Manual
+    </button>
+    <button
+      x-show="jogo && modo == 'automatico'"
+      title="Mudar para modo manual"
+      @click="modo = 'manual'"
+    >
+      Automático
+    </button>
+    <button
+      :class="som || 'button-outline'"
+      @click="som = !som"
+    >
+      Som
+    </button>
   </div>
-  <span class="button" x-text="`${getMarcados(cartela)} / 24`"></span>
-  <button
-    x-show="numeros.length && modo == 'manual'"
-    title="Mudar para modo automático"
-    @click="automatico"
-  >
-    Manual
-  </button>
-  <button
-    x-show="numeros.length && modo == 'automatico'"
-    title="Mudar para modo manual"
-    @click="manual"
-  >
-    Automático
-  </button>
-</div>
+</template>

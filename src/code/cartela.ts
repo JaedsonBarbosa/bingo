@@ -14,12 +14,6 @@ function filtrarColunasCartela(nums: number[]): INumeroCartela[][] {
   return res
 }
 
-export function getLetra(n: number) {
-  const cols = ['B', 'I', 'N', 'G', 'O']
-  const index = Math.floor((n - 1) / 15)
-  return cols[index]
-}
-
 function misturar(array: number[]) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * i)

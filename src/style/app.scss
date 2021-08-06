@@ -18,8 +18,7 @@ span.button {
     height: 4rem;
     line-height: 4rem;
     margin: 0 2rem 1rem 0;
-    background: lightgray;
-    border: 1px solid black;
+    border: 2px solid;
     text-align: center;
     border-radius: 50%;
 
@@ -62,47 +61,47 @@ span.button {
       margin: auto;
     }
 
-    &.marcado {
-      font-weight: bold;
-    }
-
-    &.vermelho {
-      color: #a00;
-      &.marcado {
-        background-color: #fdd;
-      }
-    }
-
-    &.verde {
-      color: #0a0;
-      &.marcado {
-        background-color: #dfd;
-      }
-    }
-
-    &.azul {
-      color: #00a;
-      &.marcado {
-        background-color: #ddf;
-      }
-    }
-
-    &.amarelo {
-      color: #aa0;
-      &.marcado {
-        background-color: #ffd;
-      }
-    }
-
-    &.roxo {
-      color: #a0a;
-      &.marcado {
-        background-color: #fdf;
-      }
-    }
-
-    &.numero {
+    &.clicavel {
       cursor: pointer;
     }
+  }
+}
+
+.forte {
+  font-weight: bold;
+}
+
+.B {
+  color: #800;
+  &.forte {
+    background-color: #fbb;
+  }
+}
+
+.I {
+  color: #080;
+  &.forte {
+    background-color: #bfb;
+  }
+}
+
+.N {
+  color: #008;
+  &.forte {
+    background-color: #bbf;
+  }
+}
+
+.G {
+  color: #880;
+  &.forte {
+    background-color: #ffb;
+  }
+}
+
+.O {
+  color: #808;
+  &.forte {
+    background-color: #fbf;
   }
 }
