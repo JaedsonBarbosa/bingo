@@ -29,7 +29,7 @@
     </template>
     <template x-if="tela != 'inicio'">
       <header class="container" style="padding: 2rem">
-        <button style="margin: 0" @click="abrir('inicio')">Voltar</button>
+        <button style="margin: 0" @click="abrir()">Voltar</button>
         <h3 style="float: right;">VoiceBingo</h3>
       </header>
     </template>
@@ -44,13 +44,11 @@
       </include>
       <div x-show="tela == 'vitoria'">
         <h1>Vitória!</h1>
-        <button x-show="!jogo" @click="abrir('inicio')">Continuar</button>
+        <button x-show="!jogo" @click="abrir()">Continuar</button>
       </div>
-      <br />
       <small
         aria-live="assertive"
-        x-text="log[0]"
-        x-effect="setTimeout(() => log.shift(), 5000)"
+        x-text="log"
       ></small>
     </main>
   </body>

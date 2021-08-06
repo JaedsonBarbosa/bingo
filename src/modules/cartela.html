@@ -1,18 +1,20 @@
 <template x-if="tela == 'jogo'">
   <div>
-    <div class="numeros" x-show="jogo">
-      <template
-        x-data="{ cols: ['B', 'I', 'N', 'G', 'O'] }"
-        x-for="(v,i) in jogo.numeros"
-      >
-        <div
-          x-data="{ v: jogo.numeros[jogo.numeros.length - 1 - i] }"
-          :class="cols[Math.floor((v - 1) / 15)]"
-          class="forte"
-          x-text="v"
-        ></div>
-      </template>
-    </div>
+    <template x-if="jogo">
+      <div class="numeros">
+        <template
+          x-data="{ cols: ['B', 'I', 'N', 'G', 'O'] }"
+          x-for="(v,i) in jogo.numeros"
+        >
+          <div
+            x-data="{ v: jogo.numeros[jogo.numeros.length - 1 - i] }"
+            :class="cols[Math.floor((v - 1) / 15)]"
+            class="forte"
+            x-text="v"
+          ></div>
+        </template>
+      </div>
+    </template>
     <div class="grid">
       <each loop="item in colunas">
         <div
@@ -61,11 +63,6 @@
     >
       Automático
     </button>
-    <button
-      :class="som || 'button-outline'"
-      @click="som = !som"
-    >
-      Som
-    </button>
+    <button :class="som || 'button-outline'" @click="som = !som">Som</button>
   </div>
 </template>

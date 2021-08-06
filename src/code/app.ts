@@ -8,7 +8,7 @@ const webapp = () => ({
   cartela: [] as INumeroCartela[][],
   modo: 'manual' as 'manual' | 'automatico',
   som: true,
-  log: [] as string[],
+  log: '',
 
   init() {
     const updateTela = () => {
@@ -16,12 +16,19 @@ const webapp = () => ({
       this.tela = hash ? hash : 'inicio'
     }
     window.onhashchange = updateTela
-    this.abrir('inicio')
+    this.abrir()
     updateTela()
   },
 
+  resetar() {
+    this.encerrarJogo?.()
+    this.jogo = undefined
+    this.cartela = []
+    this.modo = 'manual'
+  },
+
   abrir(tela = 'inicio' as 'inicio' | 'jogo' | 'vitoria') {
-    if (tela == 'inicio') this.encerrarJogo?.()
+    if (tela == 'inicio') this.resetar()
     window.open('#' + tela, '_self')
   },
 
@@ -30,14 +37,23 @@ const webapp = () => ({
     const monitorar = () =>
       (this.encerrarJogo = jogo.onSnapshot(async (j) => {
         if (j.exists) {
-          this.jogo = j.data() as IJogo
+          const jogo = j.data() as IJogo
+          const antigos = this.jogo!.numeros
+          const novos = jogo.numeros.filter((v) => !antigos.includes(v))
+          if (novos.length) {
+            const aviso =
+              'Chamado' +
+              (novos.length > 1 ? 's ' : ' ') +
+              novos.join(', ') +
+              '.'
+            this.falar(aviso)
+          }
+          this.jogo = jogo
           if (this.modo == 'automatico') {
             this.validarMarcacoes()
           }
         } else {
-          this.jogo = undefined
-          this.modo = 'manual'
-          this.cartela = []
+          this.resetar()
           this.abrir()
         }
       }))
@@ -72,7 +88,7 @@ const webapp = () => ({
   },
 
   offline() {
-    this.encerrarJogo?.()
+    this.resetar()
     this.cartela = gerar()
     this.falar('Cartela gerada, bom jogo.')
     this.abrir('jogo')
@@ -80,14 +96,15 @@ const webapp = () => ({
 
   getMarcados(cartela: INumeroCartela[][]) {
     const nCartelas = cartela.flatMap((v) => v.filter((k) => k.m))
-    const vitoria =
-      nCartelas.length == 24 &&
-      nCartelas.every((v) => this.jogo?.numeros.some((k) => k == v.v))
-    if (vitoria) {
-      cartelas
-        .doc(auth.currentUser!.uid)
-        .update({ ganhou: true })
-        .then(() => this.abrir('vitoria'))
+    if (nCartelas.length == 24) {
+      if (this.jogo) {
+        if (nCartelas.every((v) => this.jogo!.numeros.some((k) => k == v.v))) {
+          cartelas
+            .doc(auth.currentUser!.uid)
+            .update({ ganhou: true })
+            .then(() => this.abrir('vitoria'))
+        } else this.falar('Você marcou números demais, amigo.')
+      } else this.abrir('vitoria')
     }
     return nCartelas.length
   },
@@ -110,7 +127,12 @@ const webapp = () => ({
   },
 
   falar(texto: string) {
-    this.log.push(texto)
+    if (this.som) {
+      this.log = texto
+      setTimeout(() => {
+        if (this.log == texto) this.log = ''
+      }, 5000)
+    } else if (this.log) this.log = ''
   },
 })
 
