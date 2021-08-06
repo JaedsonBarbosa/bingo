@@ -10,7 +10,12 @@ import {
 } from './commom'
 import Alpine from 'alpinejs'
 import IBGE from './IBGE'
-import { getLetra } from './cartela'
+
+function getLetra(n: number) {
+  const cols = ['B', 'I', 'N', 'G', 'O']
+  const index = Math.floor((n - 1) / 15)
+  return cols[index]
+}
 
 const admin = () => ({
   tela: '',

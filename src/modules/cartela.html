@@ -16,11 +16,11 @@
       </div>
     </template>
     <div class="grid">
-      <each loop="item in colunas">
+      <each loop="item, i in colunas">
         <div
           class="{{item}} forte"
           x-data="{ get r() { return cartela[{{i}}]?.filter(v => !v.m).map(v => v.v) ?? [] } }"
-          :title="r.length ? `{{item}}: ${r.join(', ')}` : 'Todos marcados'"
+          :aria-label="`{{item}}: ${r.length ? r.join(', ') : 'Todos marcados'}`"
         >
           {{ item }}
         </div>
@@ -30,7 +30,7 @@
           <if condition="l == 2 && c == 2">
             <div>
               <img
-                src="assets/logo.jpg"
+                src="assets/logo.png"
                 title="Uma cartela de bingo, com o símbolo de acessibilidade no centro."
               />
             </div>
@@ -41,7 +41,7 @@
               x-data="{ get d() { return cartela[{{c}}]?.[{{l}}] ?? {} } }"
               x-text="d.v"
               :class="d.m && 'forte'"
-              :title="d.v + (d.m ? ' marcado' : '')"
+              :aria-label="d.v + (d.m ? ' marcado' : '')"
               @click="d.m = !d.m"
             ></div>
           </else>
@@ -51,14 +51,14 @@
     <span class="button" x-text="`${getMarcados(cartela)} / 24`"></span>
     <button
       x-show="jogo && modo == 'manual'"
-      title="Mudar para modo automático"
+      aria-label="Mudar para modo automático"
       @click="automatico"
     >
       Manual
     </button>
     <button
       x-show="jogo && modo == 'automatico'"
-      title="Mudar para modo manual"
+      aria-label="Mudar para modo manual"
       @click="modo = 'manual'"
     >
       Automático

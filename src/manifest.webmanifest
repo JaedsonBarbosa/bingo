@@ -1,0 +1,19 @@
+{
+  "dir": "ltr",
+  "lang": "pt-BR",
+  "name": "VoiceBingo",
+  "categories": ["games", "social"],
+  "display": "fullscreen",
+  "start_url": "./app.html",
+  "background_color": "aliceblue",
+  "theme_color": "aliceblue",
+  "description": "Um Bingo pensado na acessibilidade.",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "./assets/logo.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}

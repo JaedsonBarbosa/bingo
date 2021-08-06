@@ -1,17 +1,28 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
   <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/png" href="assets/logo.jpg" />
-    <title>Voice Bingo</title>
-    <link rel="stylesheet" href="style/global.scss" />
+    <include src="modules/defHead.html"></include>
+    <if condition="NODE_ENV == 'production'">
+      <script>
+        const sw = '/sw.js'
+        navigator.serviceWorker.register(sw)
+        const standalone = window.matchMedia(
+          '(display-mode: standalone)'
+        ).matches
+        const fullscreen = window.matchMedia(
+          '(display-mode: fullscreen)'
+        ).matches
+        if (standalone || fullscreen) window.open('./app.html', '_self')
+        window.addEventListener('appinstalled', () => window.close())
+      </script>
+    </if>
   </head>
   <body>
     <include src="modules/minHeader.html"></include>
     <main class="container">
       Aqui temos um grande vazio, por enquanto...
+      <pwa-install manifestpath="./manifest.webmanifest"></pwa-install>
+      <script type="module" src="code/index.ts"></script>
     </main>
   </body>
 </html>
