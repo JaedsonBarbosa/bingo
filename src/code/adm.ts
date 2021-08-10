@@ -78,7 +78,10 @@ const admin = () => ({
           },
         }))
       },
-      () => alert('Aparentemente não estamos conseguindo acessar os usuários.')
+      (e) => {
+        console.log(e)
+        alert('Aparentemente não estamos conseguindo acessar os usuários.')
+      }
     )
   },
 
@@ -97,7 +100,7 @@ const admin = () => ({
         const numeros = this.jogo.numeros
         const last = numeros[numeros.length - 1]
         this.ultimoNumero = getLetra(last) + ' ' + last
-        this.jogo.numeros.sort((a,b) => a - b)
+        this.jogo.numeros.sort((a, b) => a - b)
       } else this.ultimoNumero = undefined
     })
     cartelas.where('ganhou', '==', true).onSnapshot(async (v) => {

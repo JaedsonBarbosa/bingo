@@ -45,7 +45,7 @@
           Números chamados:
           <em x-text="jogo?.numeros.join(', ')"></em>
         </p>
-        <p aria-live="assertive">
+        <p aria-live="assertive" x-show="jogo?.numeros.length">
           Último número:
           <em x-text="ultimoNumero ?? 'Aguardando...'"></em>
         </p>

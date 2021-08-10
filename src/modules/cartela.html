@@ -2,13 +2,9 @@
   <div>
     <template x-if="jogo">
       <div class="numeros">
-        <template
-          x-data="{ cols: ['B', 'I', 'N', 'G', 'O'] }"
-          x-for="(v,i) in jogo.numeros"
-        >
+        <template x-for="v in jogo.numeros">
           <div
-            x-data="{ v: jogo.numeros[jogo.numeros.length - 1 - i] }"
-            :class="cols[Math.floor((v - 1) / 15)]"
+            :class="getCol(v)"
             class="forte"
             x-text="v"
           ></div>
@@ -20,10 +16,7 @@
         <div
           class="{{item}} forte"
           x-data="{ get r() { return cartela[{{i}}]?.filter(v => !v.m).map(v => v.v) ?? [] } }"
-          :aria-label="`{{item}}: ${r.length ? r.join(', ') : 'Todos marcados'}`"
-        >
-          {{ item }}
-        </div>
+        >{{item}}<small x-text="r.length ? r.join(', ') : 'Todos marcados'"></small></div>
       </each>
       <each loop="l in [0, 1, 2, 3, 4]">
         <each loop="v, c in colunas">
@@ -39,11 +32,9 @@
             <div
               class="clicavel {{v}}"
               x-data="{ get d() { return cartela[{{c}}]?.[{{l}}] ?? {} } }"
-              x-text="d.v"
               :class="d.m && 'forte'"
-              :aria-label="d.v + (d.m ? ' marcado' : '')"
               @click="d.m = !d.m"
-            ></div>
+            ><span x-text="d.v"></span><small x-show="d.m">marcado</small></div>
           </else>
         </each>
       </each>
@@ -63,6 +54,12 @@
     >
       Automático
     </button>
-    <button :class="som || 'button-outline'" @click="som = !som">Som</button>
+    <button
+      :class="som || 'button-outline'"
+      @click="som = !som"
+      :aria-label="som ? 'Som ativado' : 'Som desativado'"
+    >
+      Som
+    </button>
   </div>
 </template>

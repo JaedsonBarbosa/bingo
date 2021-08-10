@@ -3,12 +3,18 @@ import { gerar } from './cartela'
 import Alpine from 'alpinejs'
 
 const webapp = () => ({
+  cols: ['B', 'I', 'N', 'G', 'O'],
+
+  getCol(v: number) {
+    return this.cols[Math.floor((v - 1) / 15)]
+  },
+
   tela: '',
   jogo: undefined as IJogo | undefined,
   cartela: [] as INumeroCartela[][],
   modo: 'manual' as 'manual' | 'automatico',
   som: true,
-  log: '',
+  log: [] as string[],
 
   init() {
     const updateTela = () => {
@@ -39,7 +45,9 @@ const webapp = () => ({
         if (j.exists) {
           const jogo = j.data() as IJogo
           const antigos = this.jogo!.numeros
-          const novos = jogo.numeros.filter((v) => !antigos.includes(v))
+          const novos = jogo.numeros
+            .reverse()
+            .filter((v) => !antigos.includes(v))
           if (novos.length) {
             const aviso =
               'Chamado' +
@@ -49,45 +57,65 @@ const webapp = () => ({
             this.falar(aviso)
           }
           this.jogo = jogo
-          if (this.modo == 'automatico') {
-            this.validarMarcacoes()
+          if (novos.length) {
+            const sufix = novos.length > 1 ? 's' : ''
+            this.falar(`Chamado${sufix} ${novos.join(', ')}`)
+            if (this.modo == 'automatico') {
+              this.validarMarcacoes(true)
+            }
           }
         } else {
           this.resetar()
           this.abrir()
         }
       }))
-    const obj = await jogo.get()
-    if (obj.exists) {
-      const data = obj.data() as IJogo
-      const doc = await cartelas.doc(auth.currentUser!.uid).get()
-      if (doc.exists) {
-        this.jogo = data
-        const cartela = doc.data() as ICartela
-        this.cartela = gerar(cartela.numeros)
-        this.validarMarcacoes()
-        monitorar()
-        this.falar('Cartela recuperada, bem-vindo de volta.')
-        this.abrir('jogo')
-      } else if (!data.numeros.length) {
-        this.jogo = data
-        const cartela = gerar()
-        const numeros = cartela.flatMap((v) => v.map((k) => k.v))
-        await cartelas
-          .doc(auth.currentUser!.uid)
-          .set({ ganhou: false, numeros })
-        this.cartela = cartela
-        monitorar()
-        this.falar('Cartela gerada e participação confirmada.')
-        this.abrir('jogo')
-      } else {
-        this.cartela = []
-        this.falar('Chegou tarde, o jogo já começou.')
-      }
-    } else this.falar('Não há nenhum jogo no momento.')
+    if (!auth.currentUser) {
+      openLogin()
+      return
+    }
+    try {
+      const obj = await jogo.get()
+      if (obj.exists) {
+        const data = obj.data() as IJogo
+        data.numeros.reverse()
+        const idUser = auth.currentUser!.uid
+        const doc = await cartelas.doc(idUser).get()
+        if (doc.exists) {
+          this.jogo = data
+          const cartela = doc.data() as ICartela
+          this.cartela = gerar(cartela.numeros)
+          this.validarMarcacoes()
+          monitorar()
+          this.falar('Cartela recuperada, bem-vindo de volta.')
+          this.abrir('jogo')
+        } else if (!data.numeros.length) {
+          this.jogo = data
+          const cartela = gerar()
+          const numeros = cartela
+            .flatMap((v) => v.map((k) => k.v))
+            .filter((v) => v > 0)
+          await cartelas.doc(idUser).set({ ganhou: false, numeros })
+          this.cartela = cartela
+          monitorar()
+          this.falar('Cartela gerada e participação confirmada.')
+          this.abrir('jogo')
+        } else {
+          this.cartela = []
+          this.falar('Chegou tarde, o jogo já começou.')
+        }
+      } else this.falar('Não há nenhum jogo no momento.')
+    } catch (error) {
+      console.log(error)
+      this.falar('Erro.')
+    }
   },
 
   offline() {
+    console.log(auth.currentUser)
+    if (!auth.currentUser) {
+      openLogin()
+      return
+    }
     this.resetar()
     this.cartela = gerar()
     this.falar('Cartela gerada, bom jogo.')
@@ -111,39 +139,38 @@ const webapp = () => ({
 
   automatico() {
     this.modo = 'automatico'
-    this.validarMarcacoes()
+    this.validarMarcacoes(true)
   },
 
-  validarMarcacoes() {
+  validarMarcacoes(log = false) {
     if (!this.jogo) return
     const n = this.jogo.numeros
     const nCartelas = this.cartela.flat()
     nCartelas
       .filter((v) => v.m && !n.includes(v.v))
-      .forEach((v) => (v.m = false)) // Marcações erradas
+      .forEach((v) => {
+        v.m = false
+        if(log) this.falar(`${v.v} desmarcado.`)
+      }) // Marcações erradas
     nCartelas
       .filter((v) => !v.m && n.includes(v.v))
-      .forEach((v) => (v.m = true)) // Marcações ignoradas
+      .forEach((v) => {
+        v.m = true
+        if (log) this.falar(`${v.v} marcado.`)
+      }) // Marcações ignoradas
   },
 
   falar(texto: string) {
-    if (this.som) {
-      this.log = texto
-      setTimeout(() => {
-        if (this.log == texto) this.log = ''
-      }, 5000)
-    } else if (this.log) this.log = ''
+    if (!texto) return
+    if (this.som) this.log.push(texto)
+  },
+
+  async limparLog(valor: string) {
+    await new Promise((resolve) => setTimeout(resolve, 5000))
+    if (this.log[0] == valor) this.log.shift()
+    else console.log(this.log[0], valor)
   },
 })
 
-let iniciado = false
-const encerrar = auth.onAuthStateChanged((user) => {
-  if (!user) {
-    encerrar()
-    openLogin()
-  } else if (!iniciado) {
-    Alpine.data('webapp', webapp)
-    Alpine.start()
-    iniciado = true
-  }
-})
+Alpine.data('webapp', webapp)
+Alpine.start()

@@ -47,8 +47,16 @@ span.button {
     line-height: 6rem;
     border: solid black;
     border-width: 1px 1px 0 0;
-
     font-size: 2rem;
+
+    br {
+      z-index: -1;
+    }
+
+    small {
+      font-size: 0;
+      z-index: -1;
+    }
 
     img {
       height: 6rem;

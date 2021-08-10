@@ -4,10 +4,10 @@
     <include src="modules/defHead.html"></include>
     <if condition="NODE_ENV == 'production'">
       <script>
-        const sw = "/sw.js";
-        navigator.serviceWorker.register(sw);
+        const sw = '/sw.js'
+        navigator.serviceWorker.register(sw)
       </script>
-    </if> 
+    </if>
     <link rel="stylesheet" href="style/app.scss" />
     <script type="module" src="code/app.ts"></script>
   </head>
@@ -20,7 +20,7 @@
             title="Uma cartela de bingo, com o símbolo de acessibilidade no centro."
           />
           <div class="div">
-            <h1>VoiceBingo</h1>
+            <h3>VoiceBingo</h3>
             <br />
             <em>Inclusivo e na palma da sua mão</em>
           </div>
@@ -28,9 +28,18 @@
       </header>
     </template>
     <template x-if="tela != 'inicio'">
-      <header class="container" style="padding: 2rem">
+      <header class="container" style="padding: 2rem; display: flex">
         <button style="margin: 0" @click="abrir()">Voltar</button>
-        <h3 style="float: right;">VoiceBingo</h3>
+        <h3
+          style="
+            flex-grow: 1;
+            text-align: center;
+            letter-spacing: 0.25rem;
+            margin-bottom: 0;
+          "
+        >
+          VoiceBingo
+        </h3>
       </header>
     </template>
     <main class="container" x-cloak>
@@ -46,10 +55,7 @@
         <h1>Vitória!</h1>
         <button x-show="!jogo" @click="abrir()">Continuar</button>
       </div>
-      <small
-        aria-live="assertive"
-        x-text="log"
-      ></small>
+      <small aria-live="assertive" x-text="log[0]" x-effect="limparLog(log[0])"></small>
     </main>
   </body>
 </html>
