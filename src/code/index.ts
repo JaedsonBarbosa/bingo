@@ -1,7 +1,7 @@
 import Alpine from 'alpinejs'
 
 Alpine.data('index', () => ({
-  instalar: undefined as undefined | (() => void),
+  instalar: undefined as undefined | Event,
 
   init() {
     function analisar() {
@@ -10,10 +10,7 @@ Alpine.data('index', () => ({
       if (standalone || fullscreen) window.open('./app.html', '_self')
     }
     analisar()
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault()
-      this.instalar = (e as any).prompt as () => void
-    })
+    window.addEventListener('beforeinstallprompt', (e) => (this.instalar = e))
     window.addEventListener('appinstalled', () => {
       this.instalar = undefined
       alert('Aplicativo instalado com sucesso.')
