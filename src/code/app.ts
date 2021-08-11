@@ -59,7 +59,10 @@ const webapp = () => ({
           this.jogo = jogo
           if (novos.length) {
             const sufix = novos.length > 1 ? 's' : ''
-            this.falar(`Chamado${sufix} ${novos.join(', ')}`)
+            const msg = `Chamado${sufix} ${novos
+              .map((v) => `${this.getCol(v)} ${v}`)
+              .join(', ')}`
+            this.falar(msg)
             if (this.modo == 'automatico') {
               this.validarMarcacoes(true)
             }
@@ -137,9 +140,13 @@ const webapp = () => ({
     return nCartelas.length
   },
 
-  automatico() {
-    this.modo = 'automatico'
-    this.validarMarcacoes(true)
+  trocarAutomatico() {
+    if (this.modo == 'manual') {
+      this.modo = 'automatico'
+      this.validarMarcacoes(true)
+    } else {
+      this.modo = 'manual'
+    }
   },
 
   validarMarcacoes(log = false) {
@@ -150,7 +157,7 @@ const webapp = () => ({
       .filter((v) => v.m && !n.includes(v.v))
       .forEach((v) => {
         v.m = false
-        if(log) this.falar(`${v.v} desmarcado.`)
+        if (log) this.falar(`${v.v} desmarcado.`)
       }) // Marcações erradas
     nCartelas
       .filter((v) => !v.m && n.includes(v.v))
@@ -166,7 +173,7 @@ const webapp = () => ({
   },
 
   async limparLog(valor: string) {
-    await new Promise((resolve) => setTimeout(resolve, 5000))
+    await new Promise((resolve) => setTimeout(resolve, 4000))
     if (this.log[0] == valor) this.log.shift()
     else console.log(this.log[0], valor)
   },

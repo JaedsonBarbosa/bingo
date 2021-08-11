@@ -6,23 +6,38 @@
       <script>
         const sw = '/sw.js'
         navigator.serviceWorker.register(sw)
-        const standalone = window.matchMedia(
-          '(display-mode: standalone)'
-        ).matches
-        const fullscreen = window.matchMedia(
-          '(display-mode: fullscreen)'
-        ).matches
-        if (standalone || fullscreen) window.open('./app.html', '_self')
-        window.addEventListener('appinstalled', () => window.close())
       </script>
     </if>
+    <script type="module" src="code/index.ts"></script>
   </head>
   <body>
     <include src="modules/minHeader.html"></include>
-    <main class="container">
-      Aqui temos um grande vazio, por enquanto...
-      <pwa-install manifestpath="./manifest.webmanifest"></pwa-install>
-      <script type="module" src="code/index.ts"></script>
+    <main class="container" x-data="index">
+      <h2>Instalação</h2>
+      <div x-show="instalar">
+        <h3>Automática</h3>
+        <button @click="instalar">Instalar</button>
+        <p>
+          Sem dúvidas este é o modo mais fácil de instalar um PWA, basta clicar
+          no botão acima e seguir as instruções que vão sendo apresentadas.
+        </p>
+      </div>
+      <h3>iOS</h3>
+      <p>
+        Para instalar no iOS, clique no botão de compartilhar e em seguida
+        clique em fixar na tela inicial.
+      </p>
+      <h3>Manual no Android</h3>
+      <p>
+        Clique no menu do navegador e em seguida clique em adicionar à tela
+        inicial, confirme clicando em adicionar.
+      </p>
+      <h3>Manual nos demais sistemas</h3>
+      <p>
+        Alguns navegadores não suportam a instalação automática de aplicativos
+        PWA, para estes casos deve-se usar a instalação manual adequada para o
+        seu navegador.
+      </p>
     </main>
   </body>
 </html>

@@ -41,7 +41,6 @@
       </include>
       <div x-show="tela == 'vitoria'">
         <h1 aria-live="assertive">Vitória!</h1>
-        <button x-show="!jogo" @click="abrir()">Continuar</button>
       </div>
       <small aria-live="assertive" x-text="log[0]" x-effect="limparLog(log[0])"></small>
     </main>

@@ -22,10 +22,6 @@ span.button {
     text-align: center;
     border-radius: 50%;
 
-    small {
-      font-size: 0;
-    }
-
     &:first-of-type {
       width: 6rem;
       height: 6rem;
@@ -36,29 +32,34 @@ span.button {
 }
 
 .grid {
+  position: relative;
   max-width: 40rem;
   margin-left: 0;
   margin-bottom: 1rem;
   display: grid;
-  grid-template-columns: auto auto auto auto auto;
+  grid-template-columns: 20% 20% 20% 20% 20%;
   border: solid black;
   border-width: 0 0 1px 1px;
 
   div {
+    width: 100%;
     position: relative;
     text-align: center;
-    height: 6rem;
     line-height: 6rem;
+    height: 6rem;
     border: solid black;
     border-width: 1px 1px 0 0;
-    font-size: 2rem;
 
-    br {
-      z-index: -1;
-    }
+    &.min {
+      line-height: 3rem;
+  
+      span {
+        font-size: 2rem;
+      }
 
-    small {
-      font-size: 0;
+      small {
+        font-size: 1rem;
+      }
     }
 
     img {

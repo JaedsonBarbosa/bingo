@@ -1,21 +1,16 @@
 <template x-if="tela == 'jogo'">
   <div>
-    <template x-if="jogo">
-      <div class="numeros">
-        <template x-for="v in jogo.numeros">
-          <div
-            :class="getCol(v)"
-            class="forte"
-          ><small x-text="getCol(v) + ' '"></small><span x-text="v"></span></div>
-        </template>
-      </div>
-    </template>
     <div class="grid">
       <each loop="item, i in colunas">
         <div
-          class="{{item}} forte"
-          x-data="{ get r() { return cartela[{{i}}]?.filter(v => !v.m).map(v => v.v) ?? [] } }"
-        >{{item}}<small x-text="r.length ? r.join(', ') : 'Todos marcados'"></small></div>
+          class="min {{item}} forte"
+          x-data="{ get r() { return cartela[{{i}}]?.filter(v => !v.m && v.v > 0).map(v => v.v) ?? [] } }"
+        >
+          <span>
+            {{item}}
+            <small x-text="r.length ? r.join(', ') : 'Todos marcados'"></small>
+          </span>
+        </div>
       </each>
       <each loop="l in [0, 1, 2, 3, 4]">
         <each loop="v, c in colunas">
@@ -33,33 +28,46 @@
               x-data="{ get d() { return cartela[{{c}}]?.[{{l}}] ?? {} } }"
               :class="d.m && 'forte'"
               @click="d.m = !d.m"
-            ><span x-text="d.v"></span><small x-show="d.m">marcado</small></div>
+              @keyup.enter="d.m = !d.m"
+              tabindex="0"
+              role="switch"
+              :aria-checked="d.m"
+              x-text="d.v"
+            ></div>
           </else>
         </each>
       </each>
     </div>
-    <span class="button" x-text="`${getMarcados(cartela)} / 24`"></span>
+    <span class="button" x-text="`${getMarcados(cartela)}/24`"></span>
     <button
-      x-show="jogo && modo == 'manual'"
-      aria-label="Mudar para modo automático"
-      @click="automatico"
+      x-show="jogo"
+      aria-label="Automático"
+      :class="modo == 'automatico' || 'button-outline'"
+      @click="trocarAutomatico"
+      role="switch"
+      :aria-checked="modo == 'automatico'"
     >
-      Manual
-    </button>
-    <button
-      x-show="jogo && modo == 'automatico'"
-      aria-label="Mudar para modo manual"
-      @click="modo = 'manual'"
-    >
-      Automático
+      Auto
     </button>
     <button
       x-show="jogo"
       :class="som || 'button-outline'"
       @click="som = !som"
-      :aria-label="som ? 'Som ativado' : 'Som desativado'"
+      role="switch"
+      :aria-checked="som"
     >
       Som
     </button>
+    <template x-if="jogo">
+      <div class="numeros">
+        <template x-for="v in jogo.numeros">
+          <div
+            :class="getCol(v)"
+            class="forte"
+            x-text="`${getCol(v)}${v}`"
+          ></div>
+        </template>
+      </div>
+    </template>
   </div>
 </template>

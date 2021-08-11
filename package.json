@@ -7,7 +7,8 @@
     "publish:clean": "if exist public rmdir /s /q public",
     "publish:build": "parcel build src/index.html src/app.html src/adm.html src/login.html --dist-dir public --no-source-maps",
     "publish:sw": "workbox generateSW workbox-config.js",
-    "publish:firebase": "firebase deploy"
+    "publish:firebase": "firebase deploy",
+    "publish:finish": "rmdir /s /q public"
   },
   "devDependencies": {
     "@parcel/packager-raw-url": "^2.0.0-rc.0",
@@ -20,7 +21,6 @@
     "workbox-cli": "^6.2.0"
   },
   "dependencies": {
-    "@pwabuilder/pwainstall": "^1.6.7",
     "alpinejs": "^3.2.3",
     "firebase": "^8.9.0",
     "milligram": "^1.4.1",
