@@ -6,8 +6,7 @@
           <div
             :class="getCol(v)"
             class="forte"
-            x-text="v"
-          ></div>
+          ><small x-text="getCol(v) + ' '"></small><span x-text="v"></span></div>
         </template>
       </div>
     </template>
@@ -55,6 +54,7 @@
       Automático
     </button>
     <button
+      x-show="jogo"
       :class="som || 'button-outline'"
       @click="som = !som"
       :aria-label="som ? 'Som ativado' : 'Som desativado'"
