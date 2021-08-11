@@ -9,5 +9,7 @@ module.exports = {
 	],
 	swDest: 'public/sw.js',
 	mode: 'production',
-	sourcemap: false
+	sourcemap: false,
+	skipWaiting: true,
+  clientsClaim: true,
 };
