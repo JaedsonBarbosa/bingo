@@ -173,8 +173,9 @@ const webapp = () => ({
   },
 
   falar(texto: string) {
-    if (!texto) return
-    if (this.som) this.log.push(texto)
+    const log = this.log
+    if (!texto || log[log.length - 1] == texto) return
+    if (this.som) log.push(texto)
   },
 
   falarRestantes(coluna: number) {
