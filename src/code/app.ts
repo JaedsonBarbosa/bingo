@@ -35,7 +35,7 @@ const webapp = () => ({
 
   abrir(tela = 'inicio' as 'inicio' | 'jogo' | 'vitoria') {
     if (tela == 'inicio') this.resetar()
-    window.open('#' + tela, '_self')
+    window.location.replace('#' + tela)
   },
 
   encerrarJogo: undefined as undefined | (() => void),
