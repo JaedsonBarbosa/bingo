@@ -12,7 +12,7 @@ const webapp = () => ({
   tela: '',
   jogo: undefined as IJogo | undefined,
   cartela: [] as INumeroCartela[][],
-  modo: 'manual' as 'manual' | 'automatico',
+  modo: 'automatico' as 'automatico' | 'manual',
   som: true,
   log: [] as string[],
 
@@ -30,7 +30,7 @@ const webapp = () => ({
     this.encerrarJogo?.()
     this.jogo = undefined
     this.cartela = []
-    this.modo = 'manual'
+    this.modo = 'automatico'
   },
 
   abrir(tela = 'inicio' as 'inicio' | 'jogo' | 'vitoria') {
@@ -114,7 +114,6 @@ const webapp = () => ({
   },
 
   offline() {
-    console.log(auth.currentUser)
     if (!auth.currentUser) {
       openLogin()
       return
@@ -153,18 +152,24 @@ const webapp = () => ({
     if (!this.jogo) return
     const n = this.jogo.numeros
     const nCartelas = this.cartela.flat()
+    const marc: number[] = []
+    const desmarc: number[] = []
     nCartelas
       .filter((v) => v.m && !n.includes(v.v))
       .forEach((v) => {
         v.m = false
-        if (log) this.falar(`${v.v} desmarcado.`)
+        if (log) desmarc.push(v.v)
       }) // Marcações erradas
     nCartelas
       .filter((v) => !v.m && n.includes(v.v))
       .forEach((v) => {
         v.m = true
-        if (log) this.falar(`${v.v} marcado.`)
+        if (log) marc.push(v.v)
       }) // Marcações ignoradas
+    if (marc.length == 1) this.falar(`Marcado ${marc[0]}.`)
+    if (marc.length > 1) this.falar(`Marcados ${marc.join(', ')}.`)
+    if (desmarc.length == 1) this.falar(`Desmarcado ${desmarc[0]}.`)
+    if (desmarc.length > 1) this.falar(`Desmarcados ${desmarc.join(', ')}.`)
   },
 
   falar(texto: string) {
@@ -172,8 +177,14 @@ const webapp = () => ({
     if (this.som) this.log.push(texto)
   },
 
+  falarRestantes(coluna: number) {
+    const r = this.cartela[coluna]?.filter((v) => !v.m && v.v > 0) ?? []
+    const t = r.length ? r.map((v) => v.v).join(', ') : 'Todos marcados'
+    this.falar(this.cols[coluna] + ', ' + t)
+  },
+
   async limparLog(valor: string) {
-    await new Promise((resolve) => setTimeout(resolve, 4000))
+    await new Promise((resolve) => setTimeout(resolve, 3000))
     if (this.log[0] == valor) this.log.shift()
     else console.log(this.log[0], valor)
   },

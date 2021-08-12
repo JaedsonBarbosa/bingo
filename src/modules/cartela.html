@@ -3,13 +3,13 @@
     <div class="grid">
       <each loop="item, i in colunas">
         <div
-          class="min {{item}} forte"
-          x-data="{ get r() { return cartela[{{i}}]?.filter(v => !v.m && v.v > 0).map(v => v.v) ?? [] } }"
+          class="{{item}} forte"
+          tabindex="0"
+          role="button"
+          @click="falarRestantes({{i}})"
+          @keyup.enter="falarRestantes({{i}})"
         >
-          <span>
-            {{item}}
-            <small x-text="r.length ? r.join(', ') : 'Todos marcados'"></small>
-          </span>
+          {{item}}
         </div>
       </each>
       <each loop="l in [0, 1, 2, 3, 4]">
@@ -27,8 +27,8 @@
               class="clicavel {{v}}"
               x-data="{ get d() { return cartela[{{c}}]?.[{{l}}] ?? {} } }"
               :class="d.m && 'forte'"
-              @click="d.m = !d.m"
-              @keyup.enter="d.m = !d.m"
+              @click="modo == 'manual' && (d.m = !d.m)"
+              @keyup.enter="modo == 'manual' && (d.m = !d.m)"
               tabindex="0"
               role="switch"
               :aria-checked="d.m"
@@ -60,7 +60,7 @@
     </button>
     <template x-if="jogo">
       <div class="numeros">
-        <template x-for="v in jogo.numeros">
+        <template x-for="v in jogo?.numeros">
           <div
             :class="getCol(v)"
             class="forte"

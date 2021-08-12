@@ -42,25 +42,12 @@ span.button {
   border-width: 0 0 1px 1px;
 
   div {
-    width: 100%;
     position: relative;
     text-align: center;
     line-height: 6rem;
     height: 6rem;
     border: solid black;
     border-width: 1px 1px 0 0;
-
-    &.min {
-      line-height: 3rem;
-  
-      span {
-        font-size: 2rem;
-      }
-
-      small {
-        font-size: 1rem;
-      }
-    }
 
     img {
       height: 6rem;
