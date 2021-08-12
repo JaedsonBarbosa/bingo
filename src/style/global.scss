@@ -25,9 +25,10 @@ p {
     }
   }
 
-  h3 {
+  h1 {
     display: inline-block;
     margin-bottom: 0;
+    font-size: 2.8rem;
   }
 
   .div {
@@ -40,9 +41,9 @@ p {
     display: inline-block;
   }
 
-  details {
+  button {
     @media (min-width: 40rem) {
-      text-align: right;
+      float: right;
     }
   }
 }

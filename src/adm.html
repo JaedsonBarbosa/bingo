@@ -8,7 +8,7 @@
     <include src="modules/header.html"></include>
     <main class="container" x-cloak>
       <div x-show="tela == 'inicio'">
-        <h3>Jogos</h3>
+        <h2>Jogos</h2>
         <a
           class="button"
           x-show="jogo?.organizador.telefone == telefone"
@@ -19,11 +19,11 @@
         <a class="button" x-show="! jogo" href="#addJogo">Abrir</a>
         <a class="button" x-show="jogos.length" href="#jogos">Consultar</a>
         <hr />
-        <h3>Administradores</h3>
+        <h2>Administradores</h2>
         <a class="button" href="#addAdmin">Adicionar</a>
         <a class="button" href="#admins">Consultar</a>
         <hr />
-        <h3>Usuários</h3>
+        <h2>Usuários</h2>
         <a class="button" href="#usuarios">Consultar</a>
       </div>
       <template x-if="tela == 'addJogo'">

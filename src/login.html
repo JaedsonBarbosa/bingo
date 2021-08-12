@@ -7,8 +7,8 @@
   <body>
     <include src="modules/minHeader.html"></include>
     <main class="container" x-data="login" x-cloak>
-      <h3 x-show="iniciadoLogado">Atualizar cadastro</h3>
-      <h3 x-show="! iniciadoLogado">Iniciar sessão</h3>
+      <h2 x-show="iniciadoLogado">Atualizar cadastro</h2>
+      <h2 x-show="! iniciadoLogado">Iniciar sessão</h2>
       <form x-show="pedirTelefone" @submit.prevent="proximo">
         <label>
           Telefone (com DDD)

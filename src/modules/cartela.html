@@ -62,9 +62,15 @@
       <div class="numeros">
         <template x-for="v in jogo?.numeros">
           <div
+            x-data="{ col: getCol(v) }"
             :class="getCol(v)"
-            class="forte"
-            x-text="`${getCol(v)}${v}`"
+            class="forte clicavel"
+            tabindex="0"
+            role="button"
+            @click="marcar(col, v)"
+            @keyup.enter="marcar(col, v)"
+            :aria-label="`${col}${v}`"
+            x-text="v"
           ></div>
         </template>
       </div>

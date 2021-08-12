@@ -18,29 +18,21 @@
     <template x-if="tela != 'inicio'">
       <header class="container" style="padding: 2rem; display: flex">
         <button style="margin: 0" @click="abrir()">Voltar</button>
-        <h3
-          style="
-            flex-grow: 1;
-            text-align: center;
-            letter-spacing: 0.5rem;
-            margin-bottom: 0;
-          "
-        >
-          Voice Bingo
-        </h3>
+        <h1 id="tituloMin">Voice Bingo</h1>
       </header>
     </template>
     <main class="container" x-cloak>
-      <div x-show="tela == 'inicio'">
-        <h3>Jogar</h3>
+      <div id="inicio" x-show="tela == 'inicio'">
+        <h2>Jogar</h2>
         <button @click="online">Online</button>
         <button @click="offline">Offline</button>
+        <button @click="openLogin()">Dados</button>
       </div>
       <include src="modules/cartela.html">
         { "colunas": ["B", "I", "N", "G", "O"] }
       </include>
       <div x-show="tela == 'vitoria'">
-        <h1 aria-live="assertive">Vitória!</h1>
+        <h2 aria-live="assertive">Vitória!</h2>
       </div>
       <small aria-live="assertive" x-text="log[0]" x-effect="limparLog(log[0])"></small>
     </main>
