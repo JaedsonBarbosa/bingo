@@ -18,9 +18,12 @@ span.button {
     height: 4rem;
     line-height: 4rem;
     margin: 0 2rem 1rem 0;
-    border: 1px solid;
     text-align: center;
     border-radius: 50%;
+
+    &.marcado {
+      border: 1px solid;
+    }
 
     &:first-of-type {
       width: 6rem;

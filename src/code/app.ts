@@ -5,8 +5,12 @@ import Alpine from 'alpinejs'
 const webapp = () => ({
   cols: ['B', 'I', 'N', 'G', 'O'],
 
+  getIndex(v: number) {
+    return Math.floor((v - 1) / 15)
+  },
+
   getCol(v: number) {
-    return this.cols[Math.floor((v - 1) / 15)]
+    return this.cols[this.getIndex(v)]
   },
 
   tela: '',
@@ -148,16 +152,6 @@ const webapp = () => ({
     } else {
       this.modo = 'manual'
     }
-  },
-
-  marcar(col: string, n: number) {
-    const v = this.cartela[this.cols.indexOf(col)].find((v) => v.v == n)
-    if (v && !v.m) {
-      v.m = true
-      this.falar(`${n} marcado.`)
-    } else if (v && v.m) {
-      this.falar('Já está marcado.')
-    } else this.falar('Não existe.')
   },
 
   validarMarcacoes(log = false) {

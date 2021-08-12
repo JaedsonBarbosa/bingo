@@ -62,14 +62,15 @@
       <div class="numeros">
         <template x-for="v in jogo?.numeros">
           <div
-            x-data="{ col: getCol(v) }"
-            :class="getCol(v)"
-            class="forte clicavel"
+            x-data="{ r: cartela[getIndex(v)].find((k) => k.v == v) }"
+            :class="getCol(v) + (r?.m ? ' marcado' : '')"
+            class="clicavel forte"
             tabindex="0"
-            role="button"
-            @click="marcar(col, v)"
-            @keyup.enter="marcar(col, v)"
-            :aria-label="`${col}${v}`"
+            role="switch"
+            :aria-checked="r?.m ?? false"
+            @click="r && (r.m = true)"
+            @keyup.enter="r && (r.m = true)"
+            :aria-label="`${getCol(v)}${v}`"
             x-text="v"
           ></div>
         </template>
