@@ -105,8 +105,8 @@ const admin = () => ({
       } else this.ultimoNumero = undefined
     })
     cartelas.onSnapshot(async (v) => {
-      if (v.empty) return
       this.numeroCartelas = v.docs.length
+      if (v.empty) return
       const ganhadores = v.docs.filter((v) => v.get('ganhou'))
       if (ganhadores.length == 0) return
       const id = ganhadores[0].id
