@@ -47,7 +47,6 @@ Alpine.data('login', () => ({
       if (!this.isAdmin && !this.iniciadoLogado) {
         const data = await usuarios.doc(id).get()
         const admin = data.get('admin')
-        console.log(admin)
         this.isAdmin = admin ?? false
       }
       if (this.isAdmin || id == 'SwHkTu4OPmd42zhPKzYa5Wh3Y6i2') openAdmin()
@@ -84,8 +83,21 @@ Alpine.data('login', () => ({
 
   async atualizar() {
     const { telefone, nome, estado, municipio } = this
+    const user = auth.currentUser!
+    const id = user.uid
+    if (telefone != user.phoneNumber) {
+      const providerT = firebase.auth.PhoneAuthProvider
+      const provider = new providerT()
+      const id = await provider.verifyPhoneNumber(telefone, captcha)
+      const codigo = prompt('Código recebido por SMS')
+      if (!codigo) {
+        alert('Operação cancelada pelo usuário.')
+        return
+      }
+      const cred = providerT.credential(id, codigo)
+      await user.updatePhoneNumber(cred)
+    }
     const data: IUsuario = { telefone, nome, estado, municipio }
-    const id = auth.currentUser!.uid
     await usuarios.doc(id).set(data, { merge: true })
     this.openNext(id)
   },

@@ -5,7 +5,7 @@
     <script defer type="module" src="code/login.ts"></script>
   </head>
   <body>
-    <include src="modules/minHeader.html"></include>
+    <include src="modules/header.html"></include>
     <main class="container" x-data="login" x-cloak>
       <h2 x-show="iniciadoLogado">Atualizar cadastro</h2>
       <h2 x-show="! iniciadoLogado">Iniciar sessão</h2>
@@ -28,6 +28,10 @@
         <input type="submit" />
       </form>
       <form x-show="exibir" @submit.prevent="atualizar">
+        <label x-show="iniciadoLogado">
+          Telefone (com DDD)
+          <input x-model="telefone" minlength="8" required pattern="^\+55\d+" />
+        </label>
         <label>
           Nome
           <input x-model="nome" minlength="2" required />

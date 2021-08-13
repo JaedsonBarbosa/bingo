@@ -25,6 +25,9 @@
         <hr />
         <h2>Usuários</h2>
         <a class="button" href="#usuarios">Consultar</a>
+        <hr />
+        <h2>Configurações</h2>
+        <button @click="alterarDados">Dados</button>
       </div>
       <template x-if="tela == 'addJogo'">
         <form x-data="{ titulo: '' }" @submit.prevent="novoJogo(titulo)">
@@ -40,7 +43,9 @@
         <h3>Gerenciamento de jogos</h3>
         <button @click="abrir('inicio')">Voltar</button>
         <button @click="encerrarJogo">Cancelar jogo</button>
-        <button @click="chamarNumero">Chamar número</button>
+        <button @click="chamarNumero" x-show="numeroCartelas > 0">
+          Chamar número
+        </button>
         <p x-show="jogo?.numeros.length">
           Números chamados:
           <em x-text="jogo?.numeros.join(', ')"></em>
@@ -52,6 +57,10 @@
         <p>
           Quantidade de números chamados:
           <em x-text="jogo?.numeros.length ?? 0"></em>
+        </p>
+        <p>
+          Quantidade de cartelas:
+          <em x-text="numeroCartelas"></em>
         </p>
       </div>
       <include src="modules/jogos.html"></include>

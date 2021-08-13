@@ -25,26 +25,16 @@ p {
     }
   }
 
-  h1 {
-    display: inline-block;
-    margin-bottom: 0;
-    font-size: 2.8rem;
-  }
-
   .div {
     h1 {
+      display: inline-block;
       margin-bottom: 0;
+      font-size: 2.8rem;
     }
 
     vertical-align: bottom;
     margin-bottom: 2rem;
     display: inline-block;
-  }
-
-  button {
-    @media (min-width: 40rem) {
-      float: right;
-    }
   }
 }
 

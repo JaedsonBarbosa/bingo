@@ -37,7 +37,7 @@ const webapp = () => ({
     this.modo = 'automatico'
   },
 
-  abrir(tela = 'inicio' as 'inicio' | 'jogo' | 'vitoria') {
+  abrir(tela = 'inicio' as 'inicio' | 'jogo') {
     if (tela == 'inicio') this.resetar()
     window.location.replace('#' + tela)
   },
@@ -52,14 +52,6 @@ const webapp = () => ({
           const novos = jogo.numeros
             .reverse()
             .filter((v) => !antigos.includes(v))
-          if (novos.length) {
-            const aviso =
-              'Chamado' +
-              (novos.length > 1 ? 's ' : ' ') +
-              novos.join(', ') +
-              '.'
-            this.falar(aviso)
-          }
           this.jogo = jogo
           if (novos.length) {
             const sufix = novos.length > 1 ? 's' : ''
@@ -86,8 +78,11 @@ const webapp = () => ({
         const data = obj.data() as IJogo
         data.numeros.reverse()
         const idUser = auth.currentUser!.uid
-        const doc = await cartelas.doc(idUser).get()
-        if (doc.exists) {
+        const doc = await cartelas
+          .doc(idUser)
+          .get()
+          .catch(() => undefined)
+        if (doc?.exists) {
           this.jogo = data
           const cartela = doc.data() as ICartela
           this.cartela = gerar(cartela.numeros)
@@ -108,12 +103,12 @@ const webapp = () => ({
           this.abrir('jogo')
         } else {
           this.cartela = []
-          this.falar('Chegou tarde, o jogo já começou.')
+          alert('Chegou tarde, o jogo já começou.')
         }
-      } else this.falar('Não há nenhum jogo no momento.')
+      } else alert('Não há nenhum jogo no momento.')
     } catch (error) {
       console.log(error)
-      this.falar('Erro.')
+      alert('Erro desconhecido.')
     }
   },
 
@@ -125,6 +120,7 @@ const webapp = () => ({
       return
     }
     this.resetar()
+    this.modo = 'manual'
     this.cartela = gerar()
     this.falar('Cartela gerada, bom jogo.')
     this.abrir('jogo')
@@ -133,14 +129,21 @@ const webapp = () => ({
   getMarcados(cartela: INumeroCartela[][]) {
     const nCartelas = cartela.flatMap((v) => v.filter((k) => k.m))
     if (nCartelas.length == 24) {
+      const vitoria = () => {
+        alert('Vitória')
+        this.abrir('inicio')
+      }
       if (this.jogo) {
         if (nCartelas.every((v) => this.jogo!.numeros.some((k) => k == v.v))) {
           cartelas
             .doc(auth.currentUser!.uid)
             .update({ ganhou: true })
-            .then(() => this.abrir('vitoria'))
-        } else this.falar('Você marcou números demais, amigo.')
-      } else this.abrir('vitoria')
+            .then(() => vitoria())
+        } else {
+          alert('Você marcou números demais, amigo.')
+          this.validarMarcacoes()
+        }
+      } else vitoria()
     }
     return nCartelas.length
   },
@@ -193,7 +196,6 @@ const webapp = () => ({
   async limparLog(valor: string) {
     await new Promise((resolve) => setTimeout(resolve, 3000))
     if (this.log[0] == valor) this.log.shift()
-    else console.log(this.log[0], valor)
   },
 })
 

@@ -60,7 +60,7 @@
     </button>
     <template x-if="jogo">
       <div class="numeros">
-        <template x-for="v in jogo?.numeros">
+        <template x-for="v in jogo?.numeros" :key="v">
           <div
             x-data="{ r: cartela[getIndex(v)].find((k) => k.v == v) }"
             :class="getCol(v) + (r?.m ? ' marcado' : '')"

@@ -13,7 +13,7 @@
   </head>
   <body x-data="webapp" x-cloak aria-label="Voice Bingo">
     <template x-if="tela == 'inicio'">
-      <include src="modules/minHeader.html"></include>
+      <include src="modules/header.html"></include>
     </template>
     <template x-if="tela != 'inicio'">
       <header class="container" style="padding: 2rem; display: flex">
@@ -31,9 +31,6 @@
       <include src="modules/cartela.html">
         { "colunas": ["B", "I", "N", "G", "O"] }
       </include>
-      <div x-show="tela == 'vitoria'">
-        <h2 aria-live="assertive">Vitória!</h2>
-      </div>
       <small aria-live="assertive" x-text="log[0]" x-effect="limparLog(log[0])"></small>
     </main>
   </body>

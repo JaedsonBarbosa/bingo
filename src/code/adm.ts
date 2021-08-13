@@ -24,6 +24,7 @@ const admin = () => ({
   alterarDados: () => openLogin(true),
   telefone: auth.currentUser!.phoneNumber,
   jogo: undefined as IJogo | undefined,
+  numeroCartelas: 0,
   ultimoNumero: undefined as string | undefined,
   usuarios: [] as IUsuarioExtendido[],
 
@@ -103,9 +104,12 @@ const admin = () => ({
         this.jogo.numeros.sort((a, b) => a - b)
       } else this.ultimoNumero = undefined
     })
-    cartelas.where('ganhou', '==', true).onSnapshot(async (v) => {
+    cartelas.onSnapshot(async (v) => {
       if (v.empty) return
-      const id = v.docs[0].id
+      this.numeroCartelas = v.docs.length
+      const ganhadores = v.docs.filter(v => v.get('ganhou'))
+      if (ganhadores.length == 0) return
+      const id = ganhadores[0].id
       const userDB = await usuarios.doc(id).get()
       await jogos.add({
         ...this.jogo,
