@@ -142,10 +142,7 @@ const webapp = () => ({
             .doc(auth.currentUser!.uid)
             .update({ ganhou: true })
             .then(() => vitoria())
-        } else {
-          this.alerta = 'Você marcou números demais, amigo.'
-          this.validarMarcacoes()
-        }
+        } else this.validarMarcacoes()
       } else vitoria()
     }
     return nCartelas.length

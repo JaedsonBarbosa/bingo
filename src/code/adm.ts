@@ -40,6 +40,8 @@ const admin = () => ({
     ateData: '',
   },
 
+  alerta: '',
+
   carregarJogos() {
     let query = jogos.orderBy('data', 'desc').limit(10)
     const ufOrg = this.filtroJogos.ufOrganizador
@@ -81,7 +83,7 @@ const admin = () => ({
       },
       (e) => {
         console.log(e)
-        alert('Aparentemente não estamos conseguindo acessar os usuários.')
+        this.alerta = 'Aparentemente não estamos conseguindo acessar os usuários.'
       }
     )
   },
@@ -107,13 +109,19 @@ const admin = () => ({
     cartelas.onSnapshot(async (v) => {
       if (v.empty) return
       this.numeroCartelas = v.docs.length
-      const ganhadores = v.docs.filter(v => v.get('ganhou'))
+      const ganhadores = v.docs.filter((v) => v.get('ganhou'))
       if (ganhadores.length == 0) return
       const id = ganhadores[0].id
       const userDB = await usuarios.doc(id).get()
+      const dataUser = userDB.data() as IUsuario
+      const inicio =
+        ganhadores.length == 1
+          ? 'O ganhador'
+          : 'Tivamos mais de um ganhador, mas escolhemos o primeiro, que'
+      this.alerta = `${inicio} é ${dataUser.nome}.`
       await jogos.add({
         ...this.jogo,
-        ganhador: { id, ...userDB.data() },
+        ganhador: { id, ...dataUser },
         data: FieldValue.serverTimestamp(),
       } as IJogos)
       await this.encerrarJogo(false)
