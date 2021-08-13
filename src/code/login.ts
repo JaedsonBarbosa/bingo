@@ -19,6 +19,14 @@ Alpine.data('login', () => ({
   ufs: IBGE,
   confirmationResult: undefined as firebase.auth.ConfirmationResult | undefined,
 
+  alerta: '',
+  submitCodigo: undefined as undefined | ((codigo: string) => void),
+
+  encerrarSessao() {
+    auth.signOut()
+    window.location.reload()
+  },
+
   init() {
     auth.onAuthStateChanged(async (v) => {
       if (!v) {
@@ -51,16 +59,14 @@ Alpine.data('login', () => ({
       }
       if (this.isAdmin || id == 'SwHkTu4OPmd42zhPKzYa5Wh3Y6i2') openAdmin()
       else {
-        const msg =
+        this.alerta =
           'Você não é um administrador, por favor, contacte um ' +
           'administrador do sistema para que você possa ser incluído.'
-        alert(msg)
       }
     } else openApp()
   },
 
   proximo() {
-    this.pedirTelefone = false
     if (!this.telefone.startsWith('+55')) this.telefone = '+55' + this.telefone
     firebase
       .auth()
@@ -68,15 +74,17 @@ Alpine.data('login', () => ({
       .then((confirmationResult) => {
         this.confirmationResult = confirmationResult
         this.pedirCodigo = true
+        this.submitCodigo = (cod) => this.logar(cod)
       })
       .catch((error) => {
         console.log(error)
-        alert('Não foi possível enviar o SMS.')
+        this.alerta = 'Não foi possível enviar o SMS.'
       })
   },
 
   async logar(codigo: string) {
     if (!this.confirmationResult) return
+    this.pedirTelefone = false
     this.pedirCodigo = false
     await this.confirmationResult.confirm(codigo)
   },
@@ -88,12 +96,19 @@ Alpine.data('login', () => ({
     if (telefone != user.phoneNumber) {
       const providerT = firebase.auth.PhoneAuthProvider
       const provider = new providerT()
-      const id = await provider.verifyPhoneNumber(telefone, captcha)
-      const codigo = prompt('Código recebido por SMS')
-      if (!codigo) {
-        alert('Operação cancelada pelo usuário.')
+      const id = await provider
+        .verifyPhoneNumber(telefone, captcha)
+        .catch(() => '')
+      if (!id) {
+        this.alerta =
+          'Não foi possível enviar o SMS. Muitas vezes encerrar a sessão ' +
+          'e logar novamente resolve este problema.'
         return
       }
+      this.pedirCodigo = true
+      const codigo = await new Promise<string>(
+        (res) => (this.submitCodigo = (cod) => res(cod))
+      )
       const cred = providerT.credential(id, codigo)
       await user.updatePhoneNumber(cred)
     }

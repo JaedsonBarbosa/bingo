@@ -7,6 +7,7 @@
   <body>
     <include src="modules/header.html"></include>
     <main class="container" x-data="login" x-cloak>
+      <include src="modules/alerta.html"></include>
       <h2 x-show="iniciadoLogado">Atualizar cadastro</h2>
       <h2 x-show="! iniciadoLogado">Iniciar sessão</h2>
       <form x-show="pedirTelefone" @submit.prevent="proximo">
@@ -16,17 +17,15 @@
         </label>
         <input id="avancar" type="submit" />
       </form>
-      <form
-        x-data="{ codigo: '' }"
-        x-show="pedirCodigo"
-        @submit.prevent="logar(codigo)"
-      >
-        <label>
-          Código
-          <input x-model="codigo" minlength="4" required />
-        </label>
-        <input type="submit" />
-      </form>
+      <dialog x-effect="pedirCodigo && $el.showModal()">
+        <form x-data="{ codigo: '' }" method="dialog" @submit="submitCodigo(codigo)">
+          <label>
+            Código
+            <input x-model="codigo" minlength="4" required />
+          </label>
+          <input type="submit" />
+        </form>
+      </dialog>
       <form x-show="exibir" @submit.prevent="atualizar">
         <label x-show="iniciadoLogado">
           Telefone (com DDD)
@@ -55,6 +54,7 @@
           </select>
         </label>
         <input type="submit" />
+        <button type="button" @click="encerrarSessao">Sair</button>
       </form>
     </main>
   </body>

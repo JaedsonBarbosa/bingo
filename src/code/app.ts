@@ -20,6 +20,8 @@ const webapp = () => ({
   som: true,
   log: [] as string[],
 
+  alerta: '',
+
   init() {
     const updateTela = () => {
       const hash = window.location.hash.substr(1)
@@ -38,6 +40,7 @@ const webapp = () => ({
   },
 
   abrir(tela = 'inicio' as 'inicio' | 'jogo') {
+    if (this.tela == tela) return
     if (tela == 'inicio') this.resetar()
     window.location.replace('#' + tela)
   },
@@ -103,12 +106,12 @@ const webapp = () => ({
           this.abrir('jogo')
         } else {
           this.cartela = []
-          alert('Chegou tarde, o jogo já começou.')
+          this.alerta = 'Chegou tarde, o jogo já começou.'
         }
-      } else alert('Não há nenhum jogo no momento.')
+      } else this.alerta = 'Não há nenhum jogo no momento.'
     } catch (error) {
       console.log(error)
-      alert('Erro desconhecido.')
+      this.alerta = 'Erro desconhecido.'
     }
   },
 
@@ -130,7 +133,7 @@ const webapp = () => ({
     const nCartelas = cartela.flatMap((v) => v.filter((k) => k.m))
     if (nCartelas.length == 24) {
       const vitoria = () => {
-        alert('Vitória')
+        this.alerta = 'BINGO!\nParabéns, você é o ganhador.'
         this.abrir('inicio')
       }
       if (this.jogo) {
@@ -140,7 +143,7 @@ const webapp = () => ({
             .update({ ganhou: true })
             .then(() => vitoria())
         } else {
-          alert('Você marcou números demais, amigo.')
+          this.alerta = 'Você marcou números demais, amigo.'
           this.validarMarcacoes()
         }
       } else vitoria()
