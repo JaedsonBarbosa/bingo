@@ -4,7 +4,17 @@ import 'firebase/firestore'
 
 export { firebase }
 
-firebase.initializeApp(JSON.parse(process.env.firebaseConfig as string))
+const firebaseConfig = {
+  projectId: 'bingo-facil-33',
+  appId: '1:920310842656:web:b84d52d7669494509ac345',
+  storageBucket: 'bingo-facil-33.appspot.com',
+  locationId: 'southamerica-east1',
+  apiKey: 'AIzaSyCi6Yr8TLH0DOfrUWtK9D7PL2C3CITzQRk',
+  authDomain: 'bingo-facil-33.firebaseapp.com',
+  messagingSenderId: '920310842656',
+}
+
+firebase.initializeApp(firebaseConfig)
 
 export const db = firebase.firestore()
 db.settings({ cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED })

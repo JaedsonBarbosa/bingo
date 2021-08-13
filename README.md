@@ -16,8 +16,6 @@ Não esquecer de executar o comando `npm install` dentro da pasta demo antes de 
 * Para atualizar a versão Web hospedada no Firebase Hosting, basta executar o comando `npm run build` dentro da pasta demo e, depois, fora da pasta demo, executar `firebase deploy --only hosting`.
 * Para atualizar as regras do Firestore usar o comando `firebase deploy --only firestore`.
 
-{"apiKey":"AIzaSyDhxqDJPSacpKe_gx1n4BppD17L4qUR8lo","authDomain":"voicebingo.firebaseapp.com","projectId":"voicebingo","storageBucket":"voicebingo.appspot.com","messagingSenderId":"574006113930","appId":"1:574006113930:web:f7ef107158ce38e46f1f73"}
-
 Implementar indices no firebase.indexes.json em relação aos filtros. Basta usar a adição automática e, após todos, sobrescrever o arquivo usando o firebase init firestore.
 
 As colunas tem cores, as bolas devem ter as cores das colunas, a ultima bola deve ser maior, útil para reconhecer as colunas para quem enxerga, mas para quem não enxerga ele deve falar a coluna (ex.: B 1, B 2, B 15...)
