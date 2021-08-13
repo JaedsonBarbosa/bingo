@@ -40,8 +40,6 @@ const admin = () => ({
     ateData: '',
   },
 
-  alerta: '',
-
   carregarJogos() {
     let query = jogos.orderBy('data', 'desc').limit(10)
     const ufOrg = this.filtroJogos.ufOrganizador
@@ -83,7 +81,7 @@ const admin = () => ({
       },
       (e) => {
         console.log(e)
-        this.alerta = 'Aparentemente não estamos conseguindo acessar os usuários.'
+        alert('Aparentemente não estamos conseguindo acessar os usuários.')
       }
     )
   },
@@ -118,7 +116,7 @@ const admin = () => ({
         ganhadores.length == 1
           ? 'O ganhador'
           : 'Tivamos mais de um ganhador, mas escolhemos o primeiro, que'
-      this.alerta = `${inicio} é ${dataUser.nome}.`
+      alert(`${inicio} é ${dataUser.nome}.`)
       await jogos.add({
         ...this.jogo,
         ganhador: { id, ...dataUser },

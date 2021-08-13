@@ -6,7 +6,7 @@
     <form method="dialog" @submit="carregarJogos">
       <label>
         Exibir até
-        <input type="date" x-model="filtroJogos.ateData">
+        <input type="date" x-model="filtroJogos.ateData" />
       </label>
       <label>
         Estado organizador
@@ -26,13 +26,21 @@
           </template>
         </select>
       </label>
-      <button type="button" @click="$refs.filtrar.close()">Cancelar</button>
-      <input type="submit">
+      <button
+        type="button"
+        @click="$refs.filtrar.close()"
+        style="margin-right: 1rem"
+      >
+        Cancelar
+      </button>
+      <input type="submit" />
     </form>
   </dialog>
   <template x-for="j in jogos">
     <details>
-      <summary x-text="j.titulo + ' - ' + j.data.toDate().toLocaleString()"></summary>
+      <summary
+        x-text="j.titulo + ' - ' + j.data.toDate().toLocaleString()"
+      ></summary>
       <p>
         <strong>Ganhador:</strong>
         <br />

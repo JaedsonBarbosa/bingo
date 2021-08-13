@@ -19,7 +19,6 @@ Alpine.data('login', () => ({
   ufs: IBGE,
   confirmationResult: undefined as firebase.auth.ConfirmationResult | undefined,
 
-  alerta: '',
   submitCodigo: undefined as undefined | ((codigo: string) => void),
 
   encerrarSessao() {
@@ -59,9 +58,10 @@ Alpine.data('login', () => ({
       }
       if (this.isAdmin || id == 'SwHkTu4OPmd42zhPKzYa5Wh3Y6i2') openAdmin()
       else {
-        this.alerta =
+        const msg =
           'Você não é um administrador, por favor, contacte um ' +
           'administrador do sistema para que você possa ser incluído.'
+        alert(msg)
       }
     } else openApp()
   },
@@ -78,7 +78,7 @@ Alpine.data('login', () => ({
       })
       .catch((error) => {
         console.log(error)
-        this.alerta = 'Não foi possível enviar o SMS.'
+        alert('Não foi possível enviar o SMS.')
       })
   },
 
@@ -100,9 +100,10 @@ Alpine.data('login', () => ({
         .verifyPhoneNumber(telefone, captcha)
         .catch(() => '')
       if (!id) {
-        this.alerta =
+        const msg =
           'Não foi possível enviar o SMS. Muitas vezes encerrar a sessão ' +
           'e logar novamente resolve este problema.'
+        alert(msg)
         return
       }
       this.pedirCodigo = true

@@ -23,6 +23,20 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
+          "fieldPath": "ganhador.estado",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "data",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "jogos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
           "fieldPath": "organizador.estado",
           "order": "ASCENDING"
         },

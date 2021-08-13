@@ -7,7 +7,6 @@
   <body x-data="admin">
     <include src="modules/header.html"></include>
     <main class="container" x-cloak>
-      <include src="modules/alerta.html"></include>
       <div x-show="tela == 'inicio'">
         <h2>Jogos</h2>
         <a
@@ -36,7 +35,13 @@
             Título
             <input x-model="titulo" minlength="4" required />
           </label>
-          <button type="button" @click="abrir('inicio')">Cancelar</button>
+          <button
+            type="button"
+            @click="abrir('inicio')"
+            style="margin-right: 1rem"
+          >
+            Cancelar
+          </button>
           <input type="submit" />
         </form>
       </template>
