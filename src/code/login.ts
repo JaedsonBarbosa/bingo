@@ -15,11 +15,7 @@ Alpine.data('login', () => ({
   municipio: '',
   iniciadoLogado: true,
   pedirTelefone: false,
-  pedirCodigo: false,
   ufs: IBGE,
-  confirmationResult: undefined as firebase.auth.ConfirmationResult | undefined,
-
-  submitCodigo: undefined as undefined | ((codigo: string) => void),
 
   encerrarSessao() {
     auth.signOut()
@@ -72,21 +68,17 @@ Alpine.data('login', () => ({
       .auth()
       .signInWithPhoneNumber(this.telefone, captcha)
       .then((confirmationResult) => {
-        this.confirmationResult = confirmationResult
-        this.pedirCodigo = true
-        this.submitCodigo = (cod) => this.logar(cod)
+        this.pedirTelefone = false
+        let codigo: string | null
+        do {
+          codigo = prompt('Codigo')
+        } while(!codigo)
+        confirmationResult.confirm(codigo)
       })
       .catch((error) => {
         console.log(error)
         alert('Não foi possível enviar o SMS.')
       })
-  },
-
-  async logar(codigo: string) {
-    if (!this.confirmationResult) return
-    this.pedirTelefone = false
-    this.pedirCodigo = false
-    await this.confirmationResult.confirm(codigo)
   },
 
   async atualizar() {
@@ -106,13 +98,14 @@ Alpine.data('login', () => ({
         alert(msg)
         return
       }
-      this.pedirCodigo = true
-      const codigo = await new Promise<string>(
-        (res) => (this.submitCodigo = (cod) => res(cod))
-      )
+      this.exibir = false
+      let codigo: string | null
+      do {
+        codigo = prompt('Codigo')
+      } while(!codigo)
       const cred = providerT.credential(id, codigo)
       await user.updatePhoneNumber(cred)
-    }
+    } else this.exibir = false
     const data: IUsuario = { telefone, nome, estado, municipio }
     await usuarios.doc(id).set(data, { merge: true })
     this.openNext(id)

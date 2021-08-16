@@ -16,15 +16,6 @@
         </label>
         <input id="avancar" type="submit" />
       </form>
-      <dialog x-effect="pedirCodigo && $el.showModal()">
-        <form x-data="{ codigo: '' }" method="dialog" @submit="submitCodigo(codigo)">
-          <label>
-            Código
-            <input x-model="codigo" minlength="4" required />
-          </label>
-          <input type="submit" />
-        </form>
-      </dialog>
       <form x-show="exibir" @submit.prevent="atualizar">
         <label x-show="iniciadoLogado">
           Telefone (com DDD)
