@@ -79,10 +79,7 @@ const admin = () => ({
           },
         }))
       },
-      (e) => {
-        console.log(e)
-        alert('Aparentemente não estamos conseguindo acessar os usuários.')
-      }
+      (e) => console.log(e)
     )
   },
 

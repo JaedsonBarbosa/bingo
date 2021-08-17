@@ -65,6 +65,7 @@ const webapp = () => ({
             }
           }
         } else {
+          alert('Que pena, você perdeu!')
           this.resetar()
           this.abrir()
         }
