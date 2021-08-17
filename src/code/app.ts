@@ -127,22 +127,28 @@ const webapp = () => ({
     this.abrir('jogo')
   },
 
+  confirmarVoltar() {
+    if (this.final || confirm('Tem certeza de que deseja sair do jogo?')) {
+      this.abrir()
+    }
+  },
+
+  final: false,
   getMarcados(cartela: INumeroCartela[][]) {
     const nCartelas = cartela.flatMap((v) => v.filter((k) => k.m))
-    if (nCartelas.length == 24) {
-      const vitoria = () => {
-        alert('BINGO!\nParabéns, você é o ganhador.')
-        this.abrir('inicio')
-      }
-      if (this.jogo) {
-        if (nCartelas.every((v) => this.jogo!.numeros.some((k) => k == v.v))) {
-          cartelas
-            .doc(auth.currentUser!.uid)
-            .update({ ganhou: true })
-            .then(() => vitoria())
-        } else this.validarMarcacoes()
-      } else vitoria()
-    }
+    const final = nCartelas.length == 24
+    if (final && this.jogo) {
+      if (nCartelas.every((v) => this.jogo!.numeros.some((k) => k == v.v))) {
+        cartelas
+          .doc(auth.currentUser!.uid)
+          .update({ ganhou: true })
+          .then(() => {
+            alert('BINGO!')
+            this.abrir()
+          })
+      } else this.validarMarcacoes()
+    } else if (final) alert('BINGO!\nParabéns, vamos conferir sua cartela.')
+    this.final = final
     return nCartelas.length
   },
 
