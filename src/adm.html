@@ -71,39 +71,32 @@
       </div>
       <include src="modules/jogos.html"></include>
       <template x-if="tela == 'addAdmin'">
-        <div
-          x-data="{ tel: '', get comuns() { return usuarios.filter(v => !v.admin) } }"
-        >
+        <div x-data="{ novoAdmin: undefined }">
           <h3>Adicionar administrador</h3>
           <button @click="abrir('inicio')">Voltar</button>
-          <label>
-            Telefone
-            <input x-model="tel" list="usuarios" />
-          </label>
-          <datalist id="usuarios">
-            <template x-for="a in comuns">
-              <option x-text="a.telefone"></option>
-            </template>
-          </datalist>
-          <template
-            x-data="{ get u() { return comuns.find(v => v.telefone == tel) } }"
-            x-if="u"
-          >
+          <form x-data="{ tel: '' }" @submit.prevent="novoAdmin = await buscarNovoAdmin(tel)">
+            <label>
+              Telefone
+              <input x-model="tel" />
+            </label>
+            <input type="submit" />
+          </form>
+          <template x-if="novoAdmin">
             <div>
               <p>
                 Telefone:
-                <span x-text="u?.telefone"></span>
+                <span x-text="novoAdmin?.telefone"></span>
                 <br />
                 Nome:
-                <span x-text="u?.nome"></span>
+                <span x-text="novoAdmin?.nome" aria-live="polite"></span>
                 <br />
                 Estado:
-                <span x-text="u?.estado"></span>
+                <span x-text="novoAdmin?.estado"></span>
                 <br />
-                Município
-                <span x-text="u?.municipio"></span>
+                Município:
+                <span x-text="novoAdmin?.municipio"></span>
               </p>
-              <button @click="u?.inverterAdmin">Promover</button>
+              <button @click="novoAdmin?.inverterAdmin">Promover</button>
             </div>
           </template>
         </div>

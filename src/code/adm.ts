@@ -27,6 +27,7 @@ const admin = () => ({
   numeroCartelas: 0,
   ultimoNumero: undefined as string | undefined,
   usuarios: [] as IUsuarioExtendido[],
+  administradores: [] as IUsuarioExtendido[],
 
   abrir(tela: string) {
     window.open('#' + tela, '_self')
@@ -58,29 +59,49 @@ const admin = () => ({
     uf: '',
   },
 
-  carregarUsuarios() {
-    console.log(this.filtroUsuarios)
-    let query = usuarios.orderBy('nome', 'asc').limit(10)
-    const nome = this.filtroUsuarios.nome
-    if (nome) {
-      // const next = (c: string) => String.fromCharCode(c.charCodeAt(0) + 1)
-      // const end = nome.replace(/.$/, next)
-      query = query.where('nome', '>=', nome) //.where('nome', '<', end)
+  async buscarNovoAdmin(telefone: string) {
+    if (!telefone.startsWith('+55')) telefone = '+55' + telefone
+    const u = await usuarios.where('telefone', '==', telefone).limit(1).get()
+    if (u.empty) {
+      alert('Nenhum resultado foi encontrado para o número ' + telefone)
+      return undefined
     }
-    const uf = this.filtroUsuarios.uf
-    if (uf) query = query.where('estado', '==', uf)
-    query.get().then(
-      (v) => {
-        this.usuarios = v.docs.map((v) => ({
-          ...(v.data() as IUsuario),
-          inverterAdmin: async () => {
-            await v.ref.update({ admin: !v.get('admin') })
-            this.abrir('inicio')
-          },
-        }))
+    const v = u.docs[0]
+    const data = v.data() as IUsuario
+    if (data.admin) {
+      alert('O usuário já é um administrador')
+      return undefined
+    }
+    return {
+      ...data,
+      inverterAdmin: async () => {
+        await v.ref.update({ admin: !v.get('admin') })
+        this.abrir('inicio')
+        this.carregarUsuarios()
       },
-      (e) => console.log(e)
-    )
+    }
+  },
+
+  async carregarUsuarios() {
+    const { nome, uf } = this.filtroUsuarios
+    let query = usuarios.orderBy('nome', 'asc').limit(10)
+    if (nome) query = query.where('nome', '>=', nome)
+    if (uf) query = query.where('estado', '==', uf)
+
+    const mapear = (v: TSnapshot) => {
+      return {
+        ...(v.data() as IUsuario),
+        inverterAdmin: async () => {
+          await v.ref.update({ admin: !v.get('admin') })
+          this.abrir('inicio')
+          this.carregarUsuarios()
+        },
+      }
+    }
+    this.usuarios = (await query.get()).docs.map((v) => mapear(v))
+    this.administradores = (
+      await query.where('admin', '==', true).get()
+    ).docs.map((v) => mapear(v))
   },
 
   init() {
