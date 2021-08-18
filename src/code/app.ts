@@ -65,7 +65,7 @@ const webapp = () => ({
             }
           }
         } else {
-          alert('Que pena, você perdeu!')
+          alert('Que pena, o ganhador não foi você.')
           this.resetar()
           this.abrir()
         }
