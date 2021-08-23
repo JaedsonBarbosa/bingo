@@ -85,18 +85,18 @@
             <div>
               <p>
                 Telefone:
-                <span x-text="novoAdmin?.telefone"></span>
+                <span x-text="novoAdmin?.get('telefone')"></span>
                 <br />
                 Nome:
-                <span x-text="novoAdmin?.nome" aria-live="polite"></span>
+                <span x-text="novoAdmin?.get('nome')" aria-live="polite"></span>
                 <br />
                 Estado:
-                <span x-text="novoAdmin?.estado"></span>
+                <span x-text="novoAdmin?.get('estado')"></span>
                 <br />
                 Município:
-                <span x-text="novoAdmin?.municipio"></span>
+                <span x-text="novoAdmin?.get('municipio')"></span>
               </p>
-              <button @click="novoAdmin?.inverterAdmin">Promover</button>
+              <button @click="inverterAdmin(novoAdmin)">Promover</button>
             </div>
           </template>
         </div>

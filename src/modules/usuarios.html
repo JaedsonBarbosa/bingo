@@ -29,21 +29,33 @@
   </dialog>
   <template x-for="u in (admins ? administradores : usuarios)">
     <details>
-      <summary x-text="u.nome"></summary>
+      <summary x-text="u.get('nome')"></summary>
       <p>
         Telefone:
-        <span x-text="u.telefone"></span>
+        <span x-text="u.get('telefone')"></span>
         <br />
         Estado:
-        <span x-text="u.estado"></span>
+        <span x-text="u.get('estado')"></span>
         <br />
         Município
-        <span x-text="u.municipio"></span>
+        <span x-text="u.get('municipio')"></span>
       </p>
       <button
-        @click="u.inverterAdmin"
-        x-text="u.admin ? 'Remover' : 'Promover'"
+        @click="inverterAdmin(u)"
+        x-text="u.get('admin') ? 'Remover' : 'Promover'"
       ></button>
     </details>
   </template>
+  <button
+    x-show="!admins && temMaisUsuarios"
+    @click="carregarMaisUsuarios"
+  >
+    Carregar mais
+  </button>
+  <button
+    x-show="admins && temMaisAdministradores"
+    @click="carregarMaisAdministradores"
+  >
+    Carregar mais
+  </button>
 </div>

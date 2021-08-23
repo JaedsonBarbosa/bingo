@@ -11,6 +11,9 @@ import {
 import Alpine from 'alpinejs'
 import IBGE from './IBGE'
 
+const LJOGOS = 20
+const LUSUARIOS = 100
+
 function getLetra(n: number) {
   const cols = ['B', 'I', 'N', 'G', 'O']
   const index = Math.floor((n - 1) / 15)
@@ -20,14 +23,17 @@ function getLetra(n: number) {
 const admin = () => ({
   tela: '',
   jogos: [] as IJogos[],
+  temMaisJogos: false,
   encerrarSessao: () => auth.signOut(),
   alterarDados: () => openLogin(true),
   telefone: auth.currentUser!.phoneNumber,
   jogo: undefined as IJogo | undefined,
   numeroCartelas: 0,
   ultimoNumero: undefined as string | undefined,
-  usuarios: [] as IUsuarioExtendido[],
-  administradores: [] as IUsuarioExtendido[],
+  usuarios: [] as TSnapshot[],
+  administradores: [] as TSnapshot[],
+  temMaisUsuarios: false,
+  temMaisAdministradores: false,
 
   abrir(tela: string) {
     window.open('#' + tela, '_self')
@@ -41,17 +47,29 @@ const admin = () => ({
     ateData: '',
   },
 
-  carregarJogos() {
-    let query = jogos.orderBy('data', 'desc').limit(10)
+  getQueryJogos() {
+    let query = jogos.orderBy('data', 'desc').limit(LJOGOS)
     const ufOrg = this.filtroJogos.ufOrganizador
     if (ufOrg) query = query.where('organizador.estado', '==', ufOrg)
     const ufGan = this.filtroJogos.ufGanhador
     if (ufGan) query = query.where('ganhador.estado', '==', ufGan)
     const ateData = this.filtroJogos.ateData
     if (ateData) query = query.where('data', '<=', new Date(ateData))
-    query
-      .get()
-      .then((v) => (this.jogos = v.docs.map((k) => k.data() as IJogos)))
+    return query
+  },
+
+  async carregarJogos() {
+    const query = this.getQueryJogos()
+    const res = await query.get()
+    this.jogos = res.docs.map((k) => k.data() as IJogos)
+    this.temMaisJogos = this.jogos.length === LJOGOS
+  },
+
+  async carregarMaisJogos() {
+    const last = this.jogos[this.jogos.length - 1]
+    const res = await this.getQueryJogos().startAfter(last.data).get()
+    this.jogos = [...this.jogos, ...res.docs.map((k) => k.data() as IJogos)]
+    if (res.docs.length < LJOGOS) this.temMaisJogos = false
   },
 
   filtroUsuarios: {
@@ -67,41 +85,48 @@ const admin = () => ({
       return undefined
     }
     const v = u.docs[0]
-    const data = v.data() as IUsuario
-    if (data.admin) {
+    if (v.get('admin')) {
       alert('O usuário já é um administrador')
       return undefined
-    }
-    return {
-      ...data,
-      inverterAdmin: async () => {
-        await v.ref.update({ admin: !v.get('admin') })
-        this.abrir('inicio')
-        this.carregarUsuarios()
-      },
-    }
+    } else return v
+  },
+
+  async inverterAdmin(v: TSnapshot) {
+    await v.ref.update({ admin: !v.get('admin') })
+    this.abrir('inicio')
+    this.carregarUsuarios()
+  },
+
+  getQueryUsuarios(admin = false) {
+    const { nome, uf } = this.filtroUsuarios
+    let query = usuarios.orderBy('nome', 'asc').limit(LUSUARIOS)
+    if (nome) query = query.where('nome', '>=', nome)
+    if (uf) query = query.where('estado', '==', uf)
+    if (admin) query = query.where('admin', '==', true)
+    return query
   },
 
   async carregarUsuarios() {
-    const { nome, uf } = this.filtroUsuarios
-    let query = usuarios.orderBy('nome', 'asc').limit(10)
-    if (nome) query = query.where('nome', '>=', nome)
-    if (uf) query = query.where('estado', '==', uf)
+    this.usuarios = (await this.getQueryUsuarios().get()).docs
+    this.temMaisUsuarios = this.usuarios.length === LUSUARIOS
+    this.administradores = (await this.getQueryUsuarios(true).get()).docs
+    this.temMaisAdministradores = this.administradores.length === LUSUARIOS
+  },
 
-    const mapear = (v: TSnapshot) => {
-      return {
-        ...(v.data() as IUsuario),
-        inverterAdmin: async () => {
-          await v.ref.update({ admin: !v.get('admin') })
-          this.abrir('inicio')
-          this.carregarUsuarios()
-        },
-      }
-    }
-    this.usuarios = (await query.get()).docs.map((v) => mapear(v))
-    this.administradores = (
-      await query.where('admin', '==', true).get()
-    ).docs.map((v) => mapear(v))
+  async carregarMaisUsuarios() {
+    const last = this.usuarios[this.usuarios.length - 1]
+    const res = await this.getQueryUsuarios().startAfter(last.get('nome')).get()
+    this.usuarios = [...this.usuarios, ...res.docs]
+    if (res.docs.length < LUSUARIOS) this.temMaisUsuarios = false
+  },
+
+  async carregarMaisAdministradores() {
+    const last = this.administradores[this.administradores.length - 1]
+    const res = await this.getQueryUsuarios(true)
+      .startAfter(last.get('nome'))
+      .get()
+    this.administradores = [...this.administradores, ...res.docs]
+    if (res.docs.length < LUSUARIOS) this.temMaisAdministradores = false
   },
 
   init() {
