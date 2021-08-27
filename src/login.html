@@ -14,6 +14,7 @@
           Telefone (com DDD)
           <input x-model="telefone" minlength="8" required />
         </label>
+        <button type="button" @click="openNext">Cancelar</button>
         <input id="avancar" type="submit" />
       </form>
       <form x-show="exibir" @submit.prevent="atualizar">
@@ -43,7 +44,12 @@
             </template>
           </select>
         </label>
-        <input type="submit" />
+        <label>
+          <input type="checkbox" x-model="deficiente" />
+          Deficiente
+        </label>
+        <button type="button" @click="openNext">Voltar</button>
+        <input type="submit" value="Salvar" />
         <button type="button" @click="encerrarSessao">Sair</button>
       </form>
     </main>

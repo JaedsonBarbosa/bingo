@@ -30,7 +30,7 @@
   <template x-for="u in (admins ? administradores : usuarios)">
     <details>
       <summary x-text="u.get('nome')"></summary>
-      <p>
+      <p x-data="{ deficiente: u.get('deficiente') ?? true }">
         Telefone:
         <span x-text="u.get('telefone')"></span>
         <br />
@@ -39,6 +39,8 @@
         <br />
         Município
         <span x-text="u.get('municipio')"></span>
+        <br x-show="deficiente" />
+        <span x-show="deficiente">Portador de deficiência</span>
       </p>
       <button
         @click="inverterAdmin(u)"
@@ -46,10 +48,7 @@
       ></button>
     </details>
   </template>
-  <button
-    x-show="!admins && temMaisUsuarios"
-    @click="carregarMaisUsuarios"
-  >
+  <button x-show="!admins && temMaisUsuarios" @click="carregarMaisUsuarios">
     Carregar mais
   </button>
   <button

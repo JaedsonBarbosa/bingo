@@ -1,4 +1,4 @@
-import { auth, cartelas, jogo, openLogin } from './commom'
+import { auth, cartelas, jogo, jogos, openLogin } from './commom'
 import { gerar } from './cartela'
 import Alpine from 'alpinejs'
 
@@ -18,6 +18,7 @@ const webapp = () => ({
   cartela: [] as INumeroCartela[][],
   modo: 'automatico' as 'automatico' | 'manual',
   som: true,
+  ganhou: false,
   log: [] as string[],
 
   init() {
@@ -35,6 +36,7 @@ const webapp = () => ({
     this.jogo = undefined
     this.cartela = []
     this.modo = 'automatico'
+    this.ganhou = false
   },
 
   abrir(tela = 'inicio' as 'inicio' | 'jogo') {
@@ -65,8 +67,20 @@ const webapp = () => ({
             }
           }
         } else {
-          alert('Que pena, o ganhador não foi você.')
-          this.resetar()
+          if (this.ganhou) {
+            const res = await jogos.orderBy('data', 'desc').limit(1).get()
+            const idGanhador = res.docs[0].get('ganhador.id')
+            if (idGanhador == auth.currentUser!.uid) {
+              alert('BINGO!')
+            } else {
+              alert(
+                'Que pena, você empatou com outros ganhadores e no ' +
+                  'sorteio de desempate você não ganhou.'
+              )
+            }
+          } else {
+            alert('Que pena, o ganhador não foi você.')
+          }
           this.abrir()
         }
       }))
@@ -143,10 +157,7 @@ const webapp = () => ({
         cartelas
           .doc(auth.currentUser!.uid)
           .update({ ganhou: true })
-          .then(() => {
-            alert('BINGO!')
-            this.abrir()
-          })
+          .then(() => (this.ganhou = true))
       } else this.validarMarcacoes()
     } else if (final) alert('BINGO!\nParabéns, vamos conferir sua cartela.')
     this.final = final

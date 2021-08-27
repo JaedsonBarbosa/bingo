@@ -13,6 +13,7 @@ Alpine.data('login', () => ({
   nome: '',
   estado: '',
   municipio: '',
+  deficiente: true,
   iniciadoLogado: true,
   pedirTelefone: false,
   ufs: IBGE,
@@ -40,20 +41,27 @@ Alpine.data('login', () => ({
         this.nome = data.nome
         this.estado = data.estado
         this.municipio = data.municipio
+        this.deficiente = data.deficiente ?? false
         this.exibir = true
-      } else this.openNext(v.uid)
+      } else this.openNext()
     })
   },
 
-  async openNext(id: string) {
+  async openNext() {
     if (toAdmin) {
+      const id = auth.currentUser?.uid
+      if (!id) {
+        alert('Como é que você vai continuar se não logou?')
+        return
+      }
       if (!this.isAdmin && !this.iniciadoLogado) {
         const data = await usuarios.doc(id).get()
         const admin = data.get('admin')
         this.isAdmin = admin ?? false
       }
-      if (this.isAdmin || id == 'SwHkTu4OPmd42zhPKzYa5Wh3Y6i2') openAdmin()
-      else {
+      if (this.isAdmin || id == 'SwHkTu4OPmd42zhPKzYa5Wh3Y6i2') {
+        openAdmin()
+      } else {
         const msg =
           'Você não é um administrador, por favor, contacte um ' +
           'administrador do sistema para que você possa ser incluído.'
@@ -69,11 +77,10 @@ Alpine.data('login', () => ({
       .signInWithPhoneNumber(this.telefone, captcha)
       .then((confirmationResult) => {
         this.pedirTelefone = false
-        let codigo: string | null
-        do {
-          codigo = prompt('Codigo')
-        } while(!codigo)
-        confirmationResult.confirm(codigo)
+        let codigo = prompt('Codigo')
+        if (codigo) {
+          confirmationResult.confirm(codigo)
+        } else this.openNext()
       })
       .catch((error) => {
         console.log(error)
@@ -82,7 +89,7 @@ Alpine.data('login', () => ({
   },
 
   async atualizar() {
-    const { telefone, nome, estado, municipio } = this
+    const { telefone, nome, estado, municipio, deficiente } = this
     const user = auth.currentUser!
     const id = user.uid
     if (telefone != user.phoneNumber) {
@@ -106,9 +113,9 @@ Alpine.data('login', () => ({
       const cred = providerT.credential(id, codigo)
       await user.updatePhoneNumber(cred)
     } else this.exibir = false
-    const data: IUsuario = { telefone, nome, estado, municipio }
+    const data: IUsuario = { telefone, nome, estado, municipio, deficiente }
     await usuarios.doc(id).set(data, { merge: true })
-    this.openNext(id)
+    this.openNext()
   },
 }))
 

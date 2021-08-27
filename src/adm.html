@@ -49,13 +49,9 @@
         <h3>Gerenciamento de jogos</h3>
         <button @click="abrir('inicio')">Voltar</button>
         <button @click="encerrarJogo">Cancelar jogo</button>
-        <button @click="chamarNumero" x-show="numeroCartelas > 0">
+        <button @click="chamarNumero" x-show="numeroCartelas > 0 && !ganhadores.length">
           Chamar número
         </button>
-        <p x-show="jogo?.numeros.length">
-          Números chamados:
-          <em x-text="jogo?.numeros.join(', ')"></em>
-        </p>
         <p aria-live="assertive" x-show="jogo?.numeros.length">
           Último número:
           <em x-text="ultimoNumero ?? 'Aguardando...'"></em>
@@ -68,37 +64,23 @@
           Quantidade de cartelas:
           <em x-text="numeroCartelas"></em>
         </p>
+        <p x-show="jogo?.numeros.length">
+          Números chamados:
+          <em x-text="jogo?.numeros.join(', ')"></em>
+        </p>
       </div>
       <include src="modules/jogos.html"></include>
       <template x-if="tela == 'addAdmin'">
-        <div x-data="{ novoAdmin: undefined }">
+        <div>
           <h3>Adicionar administrador</h3>
           <button @click="abrir('inicio')">Voltar</button>
-          <form x-data="{ tel: '' }" @submit.prevent="novoAdmin = await buscarNovoAdmin(tel)">
+          <form x-data="{ tel: '' }" @submit.prevent="buscarNovoAdmin(tel)">
             <label>
               Telefone
               <input x-model="tel" />
             </label>
             <input type="submit" />
           </form>
-          <template x-if="novoAdmin">
-            <div>
-              <p>
-                Telefone:
-                <span x-text="novoAdmin?.get('telefone')"></span>
-                <br />
-                Nome:
-                <span x-text="novoAdmin?.get('nome')" aria-live="polite"></span>
-                <br />
-                Estado:
-                <span x-text="novoAdmin?.get('estado')"></span>
-                <br />
-                Município:
-                <span x-text="novoAdmin?.get('municipio')"></span>
-              </p>
-              <button @click="inverterAdmin(novoAdmin)">Promover</button>
-            </div>
-          </template>
         </div>
       </template>
       <include src="modules/usuarios.html"></include>

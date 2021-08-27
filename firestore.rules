@@ -11,30 +11,24 @@ service cloud.firestore {
       return verificarCamposData(request.resource.data, obrigatorio, opcional);
     }
 
-    function isLogged() {
-      return request.auth != null;
-    }
-
     function buscarUsuario() {
       return get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data;
     }
 
     function getAdmin(data) {
-      let hasAdmin = data.keys().hasAll(['admin']);
-      return hasAdmin && data.admin
+      return data.keys().hasAll(['admin']) && data.admin
     }
 
     function isAdmin() {
       return request.auth.uid == 'SwHkTu4OPmd42zhPKzYa5Wh3Y6i2' || getAdmin(buscarUsuario());
     }
 
-    function organizadorValido(organizador) {
-      let user = buscarUsuario();
-      return verificarCamposData(organizador, ['telefone', 'nome', 'estado', 'municipio'], ['admin'])
-        && organizador.telefone == user.telefone
-        && organizador.nome == user.nome
-        && organizador.estado == user.estado
-        && organizador.municipio == user.municipio;
+    function existeJogoAtivo() {
+      return exists(/databases/$(database)/documents/geral/jogo);
+    }
+
+    function getNumerosJogo() {
+      return get(/databases/$(database)/documents/geral/jogo).data.numeros;
     }
 
     match /geral/jogo {
@@ -53,47 +47,13 @@ service cloud.firestore {
         return tituloIgual && novaListaEhUniao && !numeroRepetido && apenasUmNovoNumero;
       }
 
-      allow read: if isLogged();
+      allow read: if request.auth != null;
       allow create: if isAdmin() && jogoValido();
       allow delete: if isAdmin();
       allow update: if isAdmin() && atualizacaoValida();
     }
 
-    function existeJogoAtivo() {
-      return exists(/databases/$(database)/documents/geral/jogo);
-    }
-
-    function getJogoAtivo() {
-      return get(/databases/$(database)/documents/geral/jogo).data;
-    }
-
     match /geral/jogo/cartelas/{cartela} {
-      function mesmoIdAntigo() {
-        return resource.id == request.auth.uid;
-      }
-
-      function mesmoIdNovo() {
-        return request.resource.id == request.auth.uid;
-      }
-
-      function jogoAindaNaoIniciou() {
-        return getJogoAtivo().numeros.size() == 0;
-      }
-
-      function mudouApenasGanhou() {
-        return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ganhou']);
-      }
-
-      function naoGanhou() {
-        return !request.resource.data.ganhou;
-      }
-
-      function realmenteGanhou() {
-        let jogo = getJogoAtivo();
-        let cartela = resource.data;
-        return jogo.numeros.hasAll(cartela.numeros);
-      }
-
       function numerosValidos(numeros) {
         let b = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].toSet();
         let i = [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30].toSet();
@@ -110,67 +70,61 @@ service cloud.firestore {
       function cartelaValida() {
         let numeros = request.resource.data.numeros;
         let numerosSet = numeros.toSet();
-        let ganhouValido = request.resource.data.ganhou == false;
         return numeros.size() == 24
           && numerosSet.size() == 24
-          && ganhouValido
+          && request.resource.data.ganhou == false
           && numerosValidos(numerosSet);
       }
 
-      allow read: if mesmoIdAntigo() || isAdmin();
-      allow create: if mesmoIdNovo()
+      allow read: if resource.id == request.auth.uid || isAdmin();
+      allow create: if request.resource.id == request.auth.uid
         && verificarCampos(['numeros', 'ganhou'], [])
         && cartelaValida()
         && existeJogoAtivo()
-        && jogoAindaNaoIniciou();
-      allow update: if (mesmoIdAntigo() || isAdmin())
-        && mudouApenasGanhou()
-        && (naoGanhou() || realmenteGanhou());
+        && getNumerosJogo().size() == 0;
+      allow update: if (resource.id == request.auth.uid || isAdmin())
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ganhou'])
+        && (!request.resource.data.ganhou || getNumerosJogo().hasAll(resource.data.numeros));
       allow delete: if isAdmin();
     }
 
     match /jogos/{jogo} {
-      function validarGanhador(ganhador) {
+      function ganhadorValido() {
+        let ganhador = request.resource.data.ganhador;
         let user = get(/databases/$(database)/documents/usuarios/$(ganhador.id)).data;
         let cartela = get(/databases/$(database)/documents/geral/jogo/cartelas/$(ganhador.id)).data;
-        let jogo = getJogoAtivo();
-        return verificarCamposData(ganhador, ['telefone', 'nome', 'estado', 'municipio', 'id'], ['admin'])
+        return verificarCamposData(ganhador, ['telefone', 'nome', 'estado', 'municipio', 'id'], ['admin', 'deficiente'])
           && ganhador.telefone == user.telefone
           && ganhador.nome == user.nome
           && ganhador.estado == user.estado
           && ganhador.municipio == user.municipio
-          && jogo.numeros.hasAll(cartela.numeros);
+          && getNumerosJogo().hasAll(cartela.numeros);
       }
 
-      function jogoValido() {
-        let data = request.resource.data;
-        return verificarCampos(['numeros', 'titulo', 'organizador', 'ganhador', 'data'], [])
-          && data.numeros.size() >= 24
-          && organizadorValido(data.organizador)
-          && data.data == request.time
-          && validarGanhador(data.ganhador);
+      function organizadorValido() {
+        let organizador = request.resource.data.organizador;
+        let user = buscarUsuario();
+        return verificarCamposData(organizador, ['telefone', 'nome', 'estado', 'municipio'], ['admin', 'deficiente'])
+          && organizador.telefone == user.telefone
+          && organizador.nome == user.nome
+          && organizador.estado == user.estado
+          && organizador.municipio == user.municipio;
       }
 
-      allow read: if isLogged();
-      allow write: if existeJogoAtivo()
-        && isAdmin()
-        && jogoValido();
+      allow read: if request.auth != null;
+      allow write: if existeJogoAtivo() && isAdmin()
+        && verificarCampos(['numeros', 'titulo', 'organizador', 'ganhador', 'data'], [])
+        && request.resource.data.numeros.size() >= 24
+        && request.resource.data.data == request.time
+        && organizadorValido()
+        && ganhadorValido();
     }
 
     match /usuarios/{usuario} {
-      function usuarioValido(podeSerAdmin) {
-        return verificarCampos(['telefone', 'nome', 'estado', 'municipio'], ['admin'])
-          && (podeSerAdmin || !getAdmin(request.resource.data));
-      }
-
-      function mesmoId() {
-        return request.resource.id == request.auth.uid;
-      }
-
       allow read: if resource == null || resource.id == request.auth.uid || isAdmin();
-      allow create: if mesmoId() && usuarioValido(false);
-      allow update: if (mesmoId() && usuarioValido(getAdmin(resource.data)))
-        || (isAdmin() && usuarioValido(true));
+      allow create, update: if request.resource.id == request.auth.uid
+        && verificarCampos(['telefone', 'nome', 'estado', 'municipio'], ['admin', 'deficiente'])
+        && (!getAdmin(request.resource.data) || getAdmin(resource.data));
       allow delete: if false;
     }
   }

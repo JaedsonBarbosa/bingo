@@ -20,6 +20,11 @@ function getLetra(n: number) {
   return cols[index]
 }
 
+function getAleatorio<T>(r: T[]): T {
+  const index = Math.floor((r.length * new Date().getMilliseconds()) / 1000)
+  return r[index]
+}
+
 const admin = () => ({
   tela: '',
   jogos: [] as IJogos[],
@@ -30,6 +35,7 @@ const admin = () => ({
   jogo: undefined as IJogo | undefined,
   numeroCartelas: 0,
   ultimoNumero: undefined as string | undefined,
+  ganhadores: [] as TSnapshot[],
   usuarios: [] as TSnapshot[],
   administradores: [] as TSnapshot[],
   temMaisUsuarios: false,
@@ -87,8 +93,10 @@ const admin = () => ({
     const v = u.docs[0]
     if (v.get('admin')) {
       alert('O usuário já é um administrador')
-      return undefined
-    } else return v
+    } else {
+      await this.inverterAdmin(v)
+      alert('Usuário promovido.')
+    }
   },
 
   async inverterAdmin(v: TSnapshot) {
@@ -147,25 +155,31 @@ const admin = () => ({
         this.jogo.numeros.sort((a, b) => a - b)
       } else this.ultimoNumero = undefined
     })
-    cartelas.onSnapshot(async (v) => {
-      this.numeroCartelas = v.docs.length
-      if (v.empty) return
-      const ganhadores = v.docs.filter((v) => v.get('ganhou'))
-      if (ganhadores.length == 0) return
-      const id = ganhadores[0].id
-      const userDB = await usuarios.doc(id).get()
+    const finalizarJogo = async () => {
+      await new Promise(res => setTimeout(res, 5000))
+      const idGanhador = getAleatorio(this.ganhadores).id
+      const userDB = await usuarios.doc(idGanhador).get()
       const dataUser = userDB.data() as IUsuario
-      const inicio =
-        ganhadores.length == 1
-          ? 'O ganhador'
-          : 'Tivamos mais de um ganhador, mas escolhemos o primeiro, que'
-      alert(`${inicio} é ${dataUser.nome}.`)
       await jogos.add({
         ...this.jogo,
-        ganhador: { id, ...dataUser },
+        ganhador: { id: idGanhador, ...dataUser },
         data: FieldValue.serverTimestamp(),
       } as IJogos)
       await this.encerrarJogo(false)
+      alert(`O ganhador é ${dataUser.nome}.`)
+      this.ganhadores = []
+    }
+    cartelas.onSnapshot((v) => {
+      this.numeroCartelas = v.docs.length
+      if (v.empty) return
+      const _ganhadores = v.docs.filter((v) => v.get('ganhou'))
+      if (this.ganhadores.length) {
+        // Se já tem algum então já tem um contador rodando
+        this.ganhadores = _ganhadores
+      } else {
+        this.ganhadores = _ganhadores
+        finalizarJogo()
+      }
     })
   },
 
@@ -178,7 +192,7 @@ const admin = () => ({
     await lote.commit()
     this.abrir('inicio')
   },
-  //Interessante separar o arquivo em subcontextos e subtelas independentes
+  
   async novoJogo(titulo: string) {
     const userDB = await usuarios.doc(auth.currentUser!.uid).get()
     const organizador = userDB.data() as IUsuario
@@ -188,11 +202,11 @@ const admin = () => ({
 
   async chamarNumero() {
     if (!this.jogo || this.jogo!.numeros.length == 75) return
-    const restantes = [...Array(75)]
+    const r = [...Array(75)]
       .map((_, i) => i + 1)
       .filter((v) => !this.jogo!.numeros.includes(v))
-    const index = Math.floor(Math.random() * restantes.length)
-    await jogo.update({ numeros: FieldValue.arrayUnion(restantes[index]) })
+    const n = getAleatorio(r)
+    await jogo.update({ numeros: FieldValue.arrayUnion(n) })
   },
 })
 

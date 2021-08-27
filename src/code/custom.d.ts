@@ -10,6 +10,7 @@ interface IUsuario {
   nome: string
   estado: string
   municipio: string
+  deficiente?: boolean
 }
 
 interface IUsuarioExtendido extends IUsuario {
