@@ -7,8 +7,8 @@
     "publish:clean": "if exist public rmdir /s /q public",
     "publish:build": "parcel build src/index.html src/app.html src/adm.html src/login.html -d public --no-source-maps",
     "publish:sw": "workbox generateSW workbox-config.js",
-    "publishh:firebase": "firebase deploy",
-    "publishh:finish": "rmdir /s /q public"
+    "publish:firebase": "firebase deploy",
+    "publish:finish": "rmdir /s /q public"
   },
   "browserslist": [
     "last 1 Chrome version"
