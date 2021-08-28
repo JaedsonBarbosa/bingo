@@ -1,27 +1,28 @@
 {
   "scripts": {
     "start": "run-p start:*",
-    "start:parcel": "parcel watch src/index.html src/app.html src/adm.html src/login.html --dist-dir public",
+    "start:parcel": "parcel watch src/index.html src/app.html src/adm.html src/login.html -d public",
     "start:firebase": "firebase emulators:start --import .save-data --export-on-exit",
     "publish": "run-s publish:*",
     "publish:clean": "if exist public rmdir /s /q public",
-    "publish:build": "parcel build src/index.html src/app.html src/adm.html src/login.html --dist-dir public --no-source-maps",
+    "publish:build": "parcel build src/index.html src/app.html src/adm.html src/login.html -d public --no-source-maps",
     "publish:sw": "workbox generateSW workbox-config.js",
-    "publish:firebase": "firebase deploy",
-    "publish:finish": "rmdir /s /q public"
+    "publishh:firebase": "firebase deploy",
+    "publishh:finish": "rmdir /s /q public"
   },
+  "browserslist": [
+    "last 1 Chrome version"
+  ],
   "devDependencies": {
-    "@parcel/packager-raw-url": "^2.0.0-rc.0",
-    "@parcel/transformer-image": "^2.0.0-rc.0",
-    "@parcel/transformer-sass": "^2.0.0-beta.3.1",
-    "@parcel/transformer-webmanifest": "^2.0.0-rc.0",
     "npm-run-all": "^4.1.5",
-    "parcel": "^2.0.0-rc.0",
+    "parcel-bundler": "^1.12.5",
     "posthtml-include": "^1.7.1",
-    "workbox-cli": "^6.2.0"
+    "sass": "^1.38.1",
+    "typescript": "^4.4.2",
+    "workbox-cli": "^6.2.4"
   },
   "dependencies": {
-    "alpinejs": "^3.2.3",
+    "alpinejs": "^3.2.4",
     "firebase": "^8.9.0",
     "milligram": "^1.4.1",
     "normalize.css": "^8.0.1"

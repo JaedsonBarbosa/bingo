@@ -19,6 +19,8 @@ Alpine.data('login', () => ({
   ufs: IBGE,
 
   encerrarSessao() {
+    const confirmacao = confirm('Tem certeza de que deseja encerrar a sessão?')
+    if (!confirmacao) return
     auth.signOut()
     window.location.reload()
   },

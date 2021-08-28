@@ -3,6 +3,7 @@ node_modules/
 .save-data/
 web-build/
 *.log
+.cache
 .parcel-cache
 .firebase
 public

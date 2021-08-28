@@ -1,6 +1,6 @@
 @import './Roboto.scss';
-@import 'normalize.css/';
-@import 'milligram';
+@import 'normalize.css';
+@import 'milligram/dist/milligram.min.css';
 
 [x-cloak] {
   display: none !important;
